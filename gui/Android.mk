@@ -24,7 +24,9 @@ LOCAL_SRC_FILES := \
     blanktimer.cpp \
     partitionlist.cpp \
     mousecursor.cpp
-
+ifneq ($(TW_HTC_LED),)
+LOCAL_SRC_FILES += batteryled.cpp
+endif
 ifneq ($(TWRP_CUSTOM_KEYBOARD),)
   LOCAL_SRC_FILES += $(TWRP_CUSTOM_KEYBOARD)
 else
@@ -67,6 +69,19 @@ ifneq ($(TW_NO_SCREEN_TIMEOUT),)
 endif
 ifeq ($(HAVE_SELINUX), true)
 LOCAL_CFLAGS += -DHAVE_SELINUX
+endif
+ifneq ($(TW_HTC_LED),)
+	LOCAL_CFLAGS += -DTW_HTC_LED
+ifneq ($(TW_HTC_CHARGING_LED_PATH),)
+	LOCAL_CFLAGS += -DTW_HTC_CHARGING_LED_PATH=$(TW_HTC_CHARGING_LED_PATH)
+else
+	LOCAL_CFLAGS += -DTW_HTC_CHARGING_LED_PATH="/sys/class/leds/amber/brightness"
+endif
+ifneq ($(TW_HTC_CHARGED_LED_PATH),)
+	LOCAL_CFLAGS += -DTW_HTC_CHARGED_LED_PATH=$(TW_HTC_CHARGED_LED_PATH)
+else
+	LOCAL_CFLAGS += -DTW_HTC_CHARGED_LED_PATH="/sys/class/leds/green/brightness"
+endif
 endif
 
 ifeq ($(DEVICE_RESOLUTION),)
