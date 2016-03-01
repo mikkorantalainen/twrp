@@ -12,16 +12,16 @@ common_src_files := \
     libtar_hash.c \
     libtar_list.c \
     output.c \
-    strlcpy.c \
     strmode.c \
     util.c \
     wrapper.c
 
+# Build shared library
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libtar_twrp
 LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS := -DHAVE_SELINUX
+LOCAL_CFLAGS += -DHAVE_SELINUX
 LOCAL_SRC_FILES := $(common_src_files)
 LOCAL_C_INCLUDES += $(LOCAL_PATH) \
                     external/libselinux/include \
@@ -29,11 +29,12 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH) \
 LOCAL_SHARED_LIBRARIES += libc libselinux libz
 include $(BUILD_SHARED_LIBRARY)
 
+# Build static library
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libtar_twrp_static
 LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS := -DHAVE_SELINUX
+LOCAL_CFLAGS += -DHAVE_SELINUX
 LOCAL_SRC_FILES := $(common_src_files)
 LOCAL_C_INCLUDES += $(LOCAL_PATH) \
                     external/libselinux/include \
