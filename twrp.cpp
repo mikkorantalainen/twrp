@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	// Handle ADB sideload
 	if (argc == 3 && strcmp(argv[1], "--adbd") == 0) {
 		property_set("ctl.stop", "adbd");
-		adb_main(0, DEFAULT_ADB_PORT);
+		adb_server_main(0, DEFAULT_ADB_PORT, -1);
 		return 0;
 	}
 

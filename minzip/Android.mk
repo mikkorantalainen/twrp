@@ -12,11 +12,13 @@ LOCAL_C_INCLUDES := \
 	external/zlib \
 	external/safe-iop/include
 
-LOCAL_SHARED_LIBRARIES := libselinux libz
-
 LOCAL_MODULE := libminzip
 
-LOCAL_CFLAGS += -Wall
+LOCAL_SHARED_LIBRARIES := libselinux libz
+
+LOCAL_CLANG := true
+
+LOCAL_CFLAGS += -Werror -Wall
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -34,10 +36,12 @@ LOCAL_C_INCLUDES += \
 	external/zlib \
 	external/safe-iop/include
 
-LOCAL_STATIC_LIBRARIES := libselinux libz
-
 LOCAL_MODULE := libminzip
 
-LOCAL_CFLAGS += -Wall
+LOCAL_STATIC_LIBRARIES := libselinux libz
+
+LOCAL_CLANG := true
+
+LOCAL_CFLAGS += -Werror -Wall
 
 include $(BUILD_STATIC_LIBRARY)

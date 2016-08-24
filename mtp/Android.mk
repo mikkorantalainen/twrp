@@ -6,10 +6,22 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libtwrpmtp
 LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS = -D_FILE_OFFSET_BITS=64 -DMTP_DEVICE -DMTP_HOST -fno-strict-aliasing
-LOCAL_C_INCLUDES += $(LOCAL_PATH) bionic frameworks/base/include system/core/include bionic/libc/private/
+
+LOCAL_CFLAGS = \
+    -D_FILE_OFFSET_BITS=64 \
+    -DMTP_DEVICE \
+    -DMTP_HOST \
+    -fno-strict-aliasing
+
+LOCAL_C_INCLUDES += \
+    bionic/libc/private \
+    frameworks/base/include \
+    system/core/include
+
 LOCAL_SRC_FILES = \
     btree.cpp \
+    mtp_MtpDatabase.cpp \
+    mtp_MtpServer.cpp \
     MtpDataPacket.cpp \
     MtpDebug.cpp \
     MtpDevice.cpp \
@@ -25,11 +37,20 @@ LOCAL_SRC_FILES = \
     MtpStorageInfo.cpp \
     MtpStringBuffer.cpp \
     MtpUtils.cpp \
-    mtp_MtpServer.cpp \
-    twrpMtp.cpp \
-    mtp_MtpDatabase.cpp \
-    node.cpp
-LOCAL_SHARED_LIBRARIES += libz libc libusbhost libstdc++ libc++ libdl libcutils libutils libaosprecovery
+    node.cpp \
+    twrpMtp.cpp
+
+LOCAL_SHARED_LIBRARIES += \
+    libaosprecovery \
+    libc \
+    libc++ \
+    libcutils \
+    libdl \
+    libselinux \
+    libstdc++ \
+    libusbhost \
+    libutils \
+    libz
 
 ifneq ($(TW_MTP_DEVICE),)
 	LOCAL_CFLAGS += -DUSB_MTP_DEVICE=$(TW_MTP_DEVICE)
@@ -43,10 +64,22 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := twrpmtp
 LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS = -D_FILE_OFFSET_BITS=64 -DMTP_DEVICE -DMTP_HOST -DTWRPMTP
-LOCAL_C_INCLUDES += $(LOCAL_PATH) bionic frameworks/base/include system/core/include bionic/libc/private/
+
+LOCAL_CFLAGS = \
+    -D_FILE_OFFSET_BITS=64 \
+    -DMTP_DEVICE \
+    -DMTP_HOST \
+    -DTWRPMTP
+
+LOCAL_C_INCLUDES += \
+    bionic/libc/private \
+    frameworks/base/include \
+    system/core/include
+
 LOCAL_SRC_FILES = \
     btree.cpp \
+    mtp_MtpDatabase.cpp \
+    mtp_MtpServer.cpp \
     MtpDataPacket.cpp \
     MtpDebug.cpp \
     MtpDevice.cpp \
@@ -62,9 +95,18 @@ LOCAL_SRC_FILES = \
     MtpStorageInfo.cpp \
     MtpStringBuffer.cpp \
     MtpUtils.cpp \
-    mtp_MtpServer.cpp \
-    twrpMtp.cpp \
-    mtp_MtpDatabase.cpp \
-    node.cpp
-LOCAL_SHARED_LIBRARIES += libz libc libusbhost libstdc++ libdl libcutils libutils libaosprecovery
+    node.cpp \
+    twrpMtp.cpp
+
+LOCAL_SHARED_LIBRARIES += \
+    libaosprecovery \
+    libc \
+    libcutils \
+    libdl \
+    libselinux \
+    libstdc++ \
+    libusbhost \
+    libutils \
+    libz
+
 include $(BUILD_EXECUTABLE)

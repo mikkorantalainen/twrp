@@ -44,6 +44,7 @@ LOCAL_SHARED_LIBRARIES += \
     libc \
     libminuitwrp \
     libminzip \
+    libselinux \
     libstdc++
 
 LOCAL_MODULE := libguitwrp

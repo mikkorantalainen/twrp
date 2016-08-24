@@ -84,10 +84,12 @@ RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libbacktrace.so
 RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libunwind.so
 RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libbase.so
 RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libc++.so
+RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libcrypto.so
+RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libpackagelistparser.so
+RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/liblzma.so
 # Dynamically loaded by libc and may prevent unmounting system if it is not present in sbin
 RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libnetd_client.so
 
-RELINK_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libmincrypttwrp.so
 RELINK_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/toolbox
 ifneq ($(TW_OEM_BUILD),true)
     RELINK_SOURCE_FILES += $(TARGET_RECOVERY_ROOT_OUT)/sbin/twrp
@@ -178,7 +180,7 @@ TWRP_AUTOGEN := $(intermediates)/teamwin
 
 GEN := $(intermediates)/teamwin
 $(GEN): $(RELINK)
-$(GEN): $(RELINK_SOURCE_FILES) $(call intermediates-dir-for,EXECUTABLES,recovery)/recovery
+$(GEN): $(RELINK_SOURCE_FILES) $(call intermediates-dir-for,EXECUTABLES,init)/init
 	$(RELINK) $(TARGET_RECOVERY_ROOT_OUT)/sbin $(RELINK_SOURCE_FILES)
 
 LOCAL_GENERATED_SOURCES := $(GEN)
@@ -206,10 +208,10 @@ include $(BUILD_PREBUILT)
 # copy license file for OpenAES
 ifneq ($(TW_EXCLUDE_ENCRYPTED_BACKUPS), true)
     include $(CLEAR_VARS)
-    LOCAL_MODULE := ../openaes/LICENSE
+    LOCAL_MODULE := openaes_license
     LOCAL_MODULE_TAGS := eng
     LOCAL_MODULE_CLASS := RECOVERY_EXECUTABLES
     LOCAL_MODULE_PATH := $(TARGET_RECOVERY_ROOT_OUT)/license/openaes
-    LOCAL_SRC_FILES := $(LOCAL_MODULE)
+    LOCAL_SRC_FILES := ../openaes/LICENSE
     include $(BUILD_PREBUILT)
 endif
