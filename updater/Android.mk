@@ -33,7 +33,7 @@ LOCAL_CLANG := true
 
 LOCAL_SRC_FILES := $(updater_src_files)
 
-LOCAL_STATIC_LIBRARIES += libfec libfec_rs libsquashfs_utils libcrypto_static
+LOCAL_STATIC_LIBRARIES += libfec libfec_rs libsquashfs_utils libcrypto_static libcrypto_utils_static
 
 ifeq ($(TARGET_USERIMAGES_USE_EXT4), true)
 LOCAL_CFLAGS += -DUSE_EXT4
@@ -66,6 +66,7 @@ ifneq ($(wildcard external/e2fsprogs/misc/tune2fs.h),)
 endif
 
 LOCAL_C_INCLUDES += external/e2fsprogs/misc
+LOCAL_C_INCLUDES += system/core/libcrypto_utils/include
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/..
 
 # Each library in TARGET_RECOVERY_UPDATER_LIBS should have a function
