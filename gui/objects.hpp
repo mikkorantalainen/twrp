@@ -44,6 +44,12 @@ using namespace rapidxml;
 #ifndef TW_Y_OFFSET
 #define TW_Y_OFFSET 0
 #endif
+#ifndef TW_W_OFFSET
+#define TW_W_OFFSET 0
+#endif
+#ifndef TW_H_OFFSET
+#define TW_H_OFFSET 0
+#endif
 
 class AnimationResource;
 class FontResource;
