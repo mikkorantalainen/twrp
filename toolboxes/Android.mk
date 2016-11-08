@@ -73,7 +73,8 @@ BUSYBOX_LINKS := $(shell cat $(LOCAL_PATH)/../busybox/busybox-full.links)
 #  fstools provides tune2fs and mke2fs
 #  pigz provides gzip gunzip
 #  dosfstools provides equivalents of mkdosfs mkfs.vfat
-BUSYBOX_EXCLUDE := tune2fs mke2fs mkdosfs mkfs.vfat gzip gunzip
+#  sh isn't working well in android 7.1, so relink mksh instead
+BUSYBOX_EXCLUDE := tune2fs mke2fs mkdosfs mkfs.vfat gzip gunzip sh
 
 # Having /sbin/modprobe present on 32 bit devices with can cause a massive
 # performance problem if the kernel has CONFIG_MODULES=y
