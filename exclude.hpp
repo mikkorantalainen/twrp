@@ -1,6 +1,6 @@
 /*
-	Copyright 2013 TeamWin
-	This file is part of TWRP/TeamWin Recovery Project.
+    Copyright 2013 to 2016 TeamWin
+    This file is part of TWRP/TeamWin Recovery Project.
 
 	TWRP is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 	along with TWRP.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _TWRPDU_HPP_HEADER
-#define _TWRPDU_HPP_HEADER
+#ifndef _TWEXCLUDE_HPP
+#define _TWEXCLUDE_HPP
 
 #include <stdint.h>
 #include <string>
@@ -25,23 +25,20 @@
 
 using namespace std;
 
-class twrpDU {
+class TWExclude {
 
 public:
-	twrpDU();
+	TWExclude();
 	uint64_t Get_Folder_Size(const string& Path); // Gets the folder's size using stat
 	void add_absolute_dir(const string& Path);
 	void add_relative_dir(const string& Path);
 	bool check_relative_skip_dirs(const string& dir);
 	bool check_absolute_skip_dirs(const string& path);
 	bool check_skip_dirs(const string& path);
-	vector<string> get_absolute_dirs(void);
 	void clear_relative_dir(string dir);
 private:
 	vector<string> absolutedir;
 	vector<string> relativedir;
 };
-
-extern twrpDU du;
 
 #endif // _TWRPDU_HPP_HEADER

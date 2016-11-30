@@ -44,7 +44,6 @@
 #include "set_metadata.h"
 #include "twcommon.h"
 #include "twrp-functions.hpp"
-#include "twrpDU.hpp"
 #include "variables.h"
 
 #ifdef HAVE_SELINUX
@@ -54,7 +53,6 @@ struct selabel_handle *selinux_handle;
 TWPartitionManager PartitionManager;
 int Log_Offset;
 bool datamedia;
-twrpDU du;
 
 static void Print_Prop(const char *key, const char *name, void *cookie) {
 	printf("%s=%s\n", key, name);
@@ -223,19 +221,19 @@ int main(int argc, char **argv) {
 			} else if (*argptr == 'p') {
 				Shutdown = true;
 			} else if (*argptr == 's') {
-				if (strncmp(argptr, "send_intent", strlen("send_intent") == 0)) {
+				if (strncmp(argptr, "send_intent", strlen("send_intent")) == 0) {
 					ptr = argptr + strlen("send_intent") + 1;
 					Send_Intent = *ptr;
-				} else if (strncmp(argptr, "security", strlen("security") == 0)) {
+				} else if (strncmp(argptr, "security", strlen("security")) == 0) {
 					LOGINFO("Security update\n");
-				} else if (strncmp(argptr, "sideload", strlen("sideload") == 0)) {
+				} else if (strncmp(argptr, "sideload", strlen("sideload")) == 0) {
 					if (!OpenRecoveryScript::Insert_ORS_Command("sideload\n"))
 						break;
-				} else if (strncmp(argptr, "stages", strlen("stages") == 0)) {
+				} else if (strncmp(argptr, "stages", strlen("stages")) == 0) {
 					LOGINFO("ignoring stages command\n");
 				}
 			} else if (*argptr == 'r') {
-				if (strncmp(argptr, "reason", strlen("reason") == 0)) {
+				if (strncmp(argptr, "reason", strlen("reason")) == 0) {
 					ptr = argptr + strlen("reason") + 1;
 					gui_print("%s\n", ptr);
 				}

@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <vector>
 
+#include "exclude.hpp"
 #include "libtar/libtar.h"
 #include "progresstracking.hpp"
 
@@ -60,6 +61,7 @@ public:
 	int progress_pipe_fd;
 	string partition_name;
 	string backup_folder;
+	TWExclude *backup_exclusions;
 
 private:
 	int extract();

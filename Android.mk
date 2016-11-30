@@ -25,6 +25,7 @@ TARGET_RECOVERY_GUI := true
 LOCAL_SRC_FILES := \
     data.cpp \
     digest/md5.c \
+    exclude.cpp \
     find_file.cpp \
     fixContexts.cpp \
     infomanager.cpp \
@@ -37,7 +38,6 @@ LOCAL_SRC_FILES := \
     twrp-functions.cpp \
     twrp.cpp \
     twrpDigest.cpp \
-    twrpDU.cpp \
     twrpTar.cpp
 
 ifneq ($(TARGET_RECOVERY_REBOOT_SRC),)

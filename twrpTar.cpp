@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 
+#include "exclude.hpp"
 #include "gui/console.h"
 #include "gui/twmsg.hpp"
 #include "progresstracking.hpp"
@@ -41,7 +42,6 @@
 #include "tarWrite.h"
 #include "twcommon.h"
 #include "twrp-functions.hpp"
-#include "twrpDU.hpp"
 #include "twrpTar.h"
 #include "twrpTar.hpp"
 #include "variables.h"
@@ -69,6 +69,7 @@ twrpTar::twrpTar(void) {
 	tar_type.readfunc = read;
 	input_fd = -1;
 	output_fd = -1;
+	backup_exclusions = NULL;
 }
 
 twrpTar::~twrpTar(void) {
@@ -101,6 +102,10 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 	int progress_pipe[2], ret;
 
 	file_count = 0;
+	if (backup_exclusions == NULL) {
+		LOGINFO("backup_exclusions is NULL\n");
+		return -1;
+	}
 
 	if (pipe(progress_pipe) < 0) {
 		LOGINFO("Error creating progress tracking pipe\n");
@@ -155,7 +160,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 			while ((de = readdir(d)) != NULL) {
 				FileName = tardir + "/" + de->d_name;
 
-				if (de->d_type == DT_BLK || de->d_type == DT_CHR || du.check_skip_dirs(FileName))
+				if (de->d_type == DT_BLK || de->d_type == DT_CHR || backup_exclusions->check_skip_dirs(FileName))
 					continue;
 				if (de->d_type == DT_DIR) {
 					item_len = strlen(de->d_name);
@@ -170,9 +175,9 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 							_exit(-1);
 						}
 						file_count = (unsigned long long)(ret);
-						regular_size += du.Get_Folder_Size(FileName);
+						regular_size += backup_exclusions->Get_Folder_Size(FileName);
 					} else {
-						encrypt_size += du.Get_Folder_Size(FileName);
+						encrypt_size += backup_exclusions->Get_Folder_Size(FileName);
 					}
 				} else if (de->d_type == DT_REG) {
 					stat(FileName.c_str(), &st);
@@ -203,7 +208,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 			while ((de = readdir(d)) != NULL) {
 				FileName = tardir + "/" + de->d_name;
 
-				if (de->d_type == DT_BLK || de->d_type == DT_CHR || du.check_skip_dirs(FileName))
+				if (de->d_type == DT_BLK || de->d_type == DT_CHR || backup_exclusions->check_skip_dirs(FileName))
 					continue;
 				if (de->d_type == DT_DIR) {
 					item_len = strlen(de->d_name);
@@ -638,7 +643,7 @@ int twrpTar::Generate_TarList(string Path, std::vector<TarListStruct> *TarList, 
 	while ((de = readdir(d)) != NULL) {
 		FileName = Path + "/" + de->d_name;
 
-		if (de->d_type == DT_BLK || de->d_type == DT_CHR || du.check_skip_dirs(FileName))
+		if (de->d_type == DT_BLK || de->d_type == DT_CHR || backup_exclusions->check_skip_dirs(FileName))
 			continue;
 		TarItem.fn = FileName;
 		TarItem.thread_id = *thread_id;

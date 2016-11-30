@@ -4,11 +4,11 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     twrpTarMain.cpp \
+    ../exclude.cpp \
     ../gui/twmsg.cpp \
     ../progresstracking.cpp \
     ../tarWrite.c \
     ../twrp-functions.cpp \
-    ../twrpDU.cpp \
     ../twrpTar.cpp
 
 LOCAL_CFLAGS:= -g -c -W -DBUILD_TWRPTAR_MAIN -DHAVE_SELINUX
@@ -20,7 +20,8 @@ LOCAL_STATIC_LIBRARIES := \
     libc \
     libselinux \
     libstdc++ \
-    libtar_twrp_static
+    libtar_twrp_static \
+    libz
 
 ifneq ($(RECOVERY_SDCARD_ON_DATA),)
     LOCAL_CFLAGS += -DRECOVERY_SDCARD_ON_DATA
@@ -42,6 +43,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     twrpTarMain.cpp \
+    ../exclude.cpp \
     ../gui/twmsg.cpp \
     ../progresstracking.cpp \
     ../tarWrite.c \
@@ -58,7 +60,8 @@ LOCAL_SHARED_LIBRARIES := \
     libc \
     libselinux \
     libstdc++ \
-    libtar_twrp
+    libtar_twrp \
+    libz
 
 ifneq ($(RECOVERY_SDCARD_ON_DATA),)
     LOCAL_CFLAGS += -DRECOVERY_SDCARD_ON_DATA
