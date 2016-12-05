@@ -366,12 +366,15 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libaosprecovery
 LOCAL_MODULE_TAGS := eng optional
-LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp legacy_property_service.cpp verifier.cpp set_metadata.cpp tw_atomic.cpp
-LOCAL_SHARED_LIBRARIES += libc liblog libcutils libmtdutils libfusesideload libselinux libc++ libcrypto
+LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp legacy_property_service.cpp verifier.cpp set_metadata.cpp tw_atomic.cpp installcommand.cpp
+LOCAL_SHARED_LIBRARIES += libc liblog libcutils libmtdutils libfusesideload libselinux libc++ libcrypto libminzip libbase
 LOCAL_CFLAGS := -std=gnu++0x
-
+LOCAL_CFLAGS += -DRECOVERY_API_VERSION=$(RECOVERY_API_VERSION)
 ifneq ($(BOARD_RECOVERY_BLDRMSG_OFFSET),)
     LOCAL_CFLAGS += -DBOARD_RECOVERY_BLDRMSG_OFFSET=$(BOARD_RECOVERY_BLDRMSG_OFFSET)
+endif
+ifeq ($(AB_OTA_UPDATER),true)
+    LOCAL_CFLAGS += -DAB_OTA_UPDATER=1
 endif
 
 include $(BUILD_SHARED_LIBRARY)
