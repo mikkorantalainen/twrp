@@ -209,6 +209,11 @@
 		<string name="enable_backup_comp_chk">Enable compression</string>
 		<string name="skip_md5_backup_chk">Skip MD5 generation during backup</string>
 		<string name="disable_backup_space_chk" version="2">Disable free space check before backup</string>
+		<string name="current_boot_slot">Current Slot: %tw_active_slot%</string>
+		<string name="boot_slot_a">Slot A</string>
+		<string name="boot_slot_b">Slot B</string>
+		<string name="changing_boot_slot">Changing Boot Slot</string>
+		<string name="changing_boot_slot_complete">Changing Boot Slot Complete</string>
 		<string name="refresh_sizes_btn">Refresh Sizes</string>
 		<string name="swipe_backup">Swipe to Backup</string>
 		<string name="append_date_btn">Append Date</string>
@@ -668,5 +673,6 @@
 		<string name="theme_ver_err">Custom theme version does not match TWRP version. Using stock theme.</string>
 		<string name="up_a_level">(Up A Level)</string>
 		<string name="install_reboot" version="2">Rebooting in %tw_sleep% second(s)</string>
+		<string name="unable_set_boot_slot">Error changing bootloader boot slot to {1}</string>
 	</resources>
 </language>

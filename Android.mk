@@ -101,6 +101,8 @@ LOCAL_CFLAGS += \
 
 ifeq ($(AB_OTA_UPDATER),true)
     LOCAL_CFLAGS += -DAB_OTA_UPDATER=1
+    LOCAL_SHARED_LIBRARIES += libhardware
+    LOCAL_ADDITIONAL_DEPENDENCIES += libhardware
 endif
 
 TWRES_PATH := /twres/
@@ -242,7 +244,7 @@ else
     LOCAL_CFLAGS += -DTW_DEFAULT_LANGUAGE=en
 endif
 
-LOCAL_ADDITIONAL_DEPENDENCIES := \
+LOCAL_ADDITIONAL_DEPENDENCIES += \
     dump_image \
     erase_image \
     fatlabel \

@@ -140,6 +140,7 @@ TWPartition::TWPartition() {
 	Mount_Read_Only = false;
 	Is_Adopted_Storage = false;
 	Adopted_GUID = "";
+	SlotSelect = false;
 }
 
 TWPartition::~TWPartition(void) {
@@ -304,7 +305,7 @@ bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error)
 #endif
 	} else if (Is_Image(Fstab_File_System)) {
 		Find_Actual_Block_Device();
-		Setup_Image(Display_Error);
+		Setup_Image();
 		if (Mount_Point == "/boot") {
 			Display_Name = "Boot";
 			Backup_Display_Name = Display_Name;
@@ -391,7 +392,7 @@ void TWPartition::Setup_Data_Partition(bool Display_Error) {
 				Is_Decrypted = false;
 				Can_Be_Mounted = false;
 				Current_File_System = "emmc";
-				Setup_Image(Display_Error);
+				Setup_Image();
 				DataManager::SetValue(TW_IS_ENCRYPTED, 1);
 				DataManager::SetValue(TW_CRYPTO_PWTYPE, cryptfs_get_password_type());
 				DataManager::SetValue(TW_CRYPTO_PASSWORD, "");
@@ -636,6 +637,9 @@ void TWPartition::Apply_TW_Flag(const unsigned flag, const char* str, const bool
 			if (Wipe_Available_in_GUI)
 				Can_Be_Wiped = true;
 			break;
+		case TWFLAG_SLOTSELECT:
+			SlotSelect = true;
+			break;
 		default:
 			// Should not get here
 			LOGINFO("Flag identified for processing, but later unmatched: %i\n", flag);
@@ -779,7 +783,7 @@ void TWPartition::Setup_File_System(bool Display_Error) {
 	Backup_Method = BM_FILES;
 }
 
-void TWPartition::Setup_Image(bool Display_Error) {
+void TWPartition::Setup_Image() {
 	Display_Name = Mount_Point.substr(1, Mount_Point.size() - 1);
 	Backup_Name = Display_Name;
 	if (Current_File_System == "emmc")
@@ -788,15 +792,6 @@ void TWPartition::Setup_Image(bool Display_Error) {
 		Backup_Method = BM_FLASH_UTILS;
 	else
 		LOGINFO("Unhandled file system '%s' on image '%s'\n", Current_File_System.c_str(), Display_Name.c_str());
-	if (Find_Partition_Size()) {
-		Used = Size;
-		Backup_Size = Size;
-	} else {
-		if (Display_Error)
-			LOGERR("Unable to find partition size for '%s'\n", Mount_Point.c_str());
-		else
-			LOGINFO("Unable to find partition size for '%s'\n", Mount_Point.c_str());
-	}
 }
 
 void TWPartition::Setup_AndSec(void) {
@@ -1691,7 +1686,7 @@ bool TWPartition::Wipe_Encryption() {
 	Has_Data_Media = false;
 	Decrypted_Block_Device = "";
 #ifdef TW_INCLUDE_CRYPTO
-	if (Is_Decrypted) {
+	if (Is_Decrypted && !Decrypted_Block_Device.empty()) {
 		if (!UnMount(true))
 			return false;
 		if (delete_crypto_blk_dev((char*)("userdata")) != 0) {
@@ -2389,8 +2384,16 @@ bool TWPartition::Restore_Image(PartitionSettings *part_settings) {
 bool TWPartition::Update_Size(bool Display_Error) {
 	bool ret = false, Was_Already_Mounted = false;
 
-	if (!Can_Be_Mounted && !Is_Encrypted)
+	Find_Actual_Block_Device();
+
+	if (!Can_Be_Mounted && !Is_Encrypted) {
+		if (TWFunc::Path_Exists(Actual_Block_Device) && Find_Partition_Size()) {
+			Used = Size;
+			Backup_Size = Size;
+			return true;
+		}
 		return false;
+	}
 
 	Was_Already_Mounted = Is_Mounted();
 	if (Removable || Is_Encrypted) {
@@ -2438,15 +2441,22 @@ bool TWPartition::Update_Size(bool Display_Error) {
 void TWPartition::Find_Actual_Block_Device(void) {
 	if (Is_Decrypted && !Decrypted_Block_Device.empty()) {
 		Actual_Block_Device = Decrypted_Block_Device;
-		if (TWFunc::Path_Exists(Decrypted_Block_Device))
+		if (TWFunc::Path_Exists(Decrypted_Block_Device)) {
 			Is_Present = true;
+			return;
+		}
+	} else if (SlotSelect && TWFunc::Path_Exists(Primary_Block_Device + PartitionManager.Get_Active_Slot_Suffix())) {
+		Actual_Block_Device = Primary_Block_Device + PartitionManager.Get_Active_Slot_Suffix();
+		unlink(Primary_Block_Device.c_str());
+		symlink(Actual_Block_Device.c_str(), Primary_Block_Device.c_str()); // we create a non-slot symlink pointing to the currently selected slot which may assist zips with installing
+		Is_Present = true;
+		return;
 	} else if (TWFunc::Path_Exists(Primary_Block_Device)) {
 		Is_Present = true;
 		Actual_Block_Device = Primary_Block_Device;
 		return;
 	}
-	if (!Is_Decrypted)
-		Is_Present = false;
+	Is_Present = false;
 }
 
 void TWPartition::Recreate_Media_Folder(void) {
