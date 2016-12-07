@@ -195,9 +195,10 @@ ifeq ($(TW_NO_EXFAT_FUSE), true)
     LOCAL_CFLAGS += -DTW_NO_EXFAT_FUSE
 endif
 ifeq ($(TW_INCLUDE_CRYPTO), true)
-    LOCAL_CFLAGS += -DTW_INCLUDE_CRYPTO
-    LOCAL_SHARED_LIBRARIES += libcryptfslollipop libgpt_twrp
+    LOCAL_CFLAGS += -DTW_INCLUDE_CRYPTO -DTW_INCLUDE_FBE
+    LOCAL_SHARED_LIBRARIES += libcryptfslollipop libgpt_twrp libe4crypt
     LOCAL_C_INCLUDES += external/boringssl/src/include
+    TW_INCLUDE_CRYPTO_FBE := true
 endif
 ifeq ($(TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID), true)
     LOCAL_CFLAGS += -DTW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID
@@ -441,6 +442,9 @@ include $(commands_recovery_local_path)/injecttwrp/Android.mk \
 ifeq ($(TW_INCLUDE_CRYPTO), true)
     include $(commands_recovery_local_path)/crypto/lollipop/Android.mk
     include $(commands_recovery_local_path)/crypto/scrypt/Android.mk
+    ifeq ($(TW_INCLUDE_CRYPTO_FBE), true)
+        include $(commands_recovery_local_path)/crypto/ext4crypt/Android.mk
+    endif
     include $(commands_recovery_local_path)/gpt/Android.mk
 endif
 ifneq ($(TW_OEM_BUILD),true)
