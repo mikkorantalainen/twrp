@@ -27,19 +27,11 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH) \
                     external/libselinux/include \
                     external/zlib
 LOCAL_SHARED_LIBRARIES += libc libselinux libz
+ifeq ($(TW_INCLUDE_CRYPTO_FBE), true)
+    LOCAL_SHARED_LIBRARIES += libe4crypt
+    LOCAL_CFLAGS += -DHAVE_EXT4_CRYPT
+    LOCAL_C_INCLUDES += $(LOCAL_PATH)/../crypto/ext4crypt
+endif
 include $(BUILD_SHARED_LIBRARY)
-
-# Build static library
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := libtar_twrp_static
-LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS += -DHAVE_SELINUX
-LOCAL_SRC_FILES := $(common_src_files)
-LOCAL_C_INCLUDES += $(LOCAL_PATH) \
-                    external/libselinux/include \
-                    external/zlib
-LOCAL_STATIC_LIBRARIES += libc libselinux libz
-include $(BUILD_STATIC_LIBRARY)
 
 common_src_files :=
