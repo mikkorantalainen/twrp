@@ -247,6 +247,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := \
     libbootloader_message \
     mke2fs.conf \
     mkfs.fat \
+    mksh_twrp \
     permissive.sh \
     pigz \
     pigz_symlinks \
@@ -425,6 +426,7 @@ include $(commands_recovery_local_path)/injecttwrp/Android.mk \
     $(commands_recovery_local_path)/minzip/Android.mk \
     $(commands_recovery_local_path)/dosfstools/Android.mk \
     $(commands_recovery_local_path)/etc/Android.mk \
+    $(commands_recovery_local_path)/mksh/Android.mk \
     $(commands_recovery_local_path)/toolboxes/Android.mk \
     $(commands_recovery_local_path)/toolboxes/mt/Android.mk \
     $(commands_recovery_local_path)/busybox/Android.mk \
