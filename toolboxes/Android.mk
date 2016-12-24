@@ -72,9 +72,9 @@ endif
 
 ifneq ($(TW_USE_TOYBOX), true)
 
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH := external/busybox
 
-BUSYBOX_LINKS := $(shell cat $(LOCAL_PATH)/../busybox/busybox-full.links)
+BUSYBOX_LINKS := $(shell cat $(LOCAL_PATH)/busybox-full.links)
 
 # Exclusions:
 #  fstools provides tune2fs and mke2fs
