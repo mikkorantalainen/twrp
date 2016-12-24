@@ -22,7 +22,7 @@ LOCAL_CFLAGS := $(minadbd_cflags)
 LOCAL_CONLY_FLAGS := -Wimplicit-function-declaration
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/.. system/core/adb
 LOCAL_WHOLE_STATIC_LIBRARIES := libadbd
-LOCAL_SHARED_LIBRARIES := libbase liblog libcutils libc libcrypto
+LOCAL_SHARED_LIBRARIES := libbase liblog libcutils libc libcrypto libcrypto_utils
 
 include $(BUILD_SHARED_LIBRARY)
 
