@@ -18,6 +18,7 @@ LOCAL_CFLAGS += \
 LOCAL_SHARED_LIBRARIES += libcutils
 
 LOCAL_C_INCLUDES += system/core/include
+LOCAL_CLANG := false
 
 LOCAL_MODULE := micro.toolbox
 LOCAL_MODULE_CLASS := RECOVERY_EXECUTABLES
