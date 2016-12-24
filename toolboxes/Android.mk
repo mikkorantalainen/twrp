@@ -35,7 +35,7 @@ LOCAL_MODULE_PATH := $(TARGET_RECOVERY_ROOT_OUT)/sbin
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libtoybox
-LOCAL_SHARED_LIBRARIES := libcutils libselinux
+LOCAL_SHARED_LIBRARIES := libc libcutils libselinux libcrypto liblog libselinux
 
 LOCAL_CFLAGS := \
     -std=c99 \
@@ -50,8 +50,15 @@ LOCAL_CFLAGS := \
     -fdata-sections \
     -fno-asynchronous-unwind-tables
 
+toybox_upstream_version := $(shell grep -o 'TOYBOX_VERSION.*\".*\"' $(LOCAL_PATH)/main.c | cut -d'"' -f2)
+toybox_sha := $(shell git -C $(LOCAL_PATH) rev-parse --short=12 HEAD 2>/dev/null)
+
+toybox_version := $(toybox_upstream_version)-$(toybox_sha)-android
+LOCAL_CFLAGS += -DTOYBOX_VERSION='"$(toybox_version)"'
+
 LOCAL_CXX_STL := none
 LOCAL_CLANG := true
+LOCAL_PACK_MODULE_RELOCATIONS := false
 
 TOYBOX_INSTLIST := $(HOST_OUT_EXECUTABLES)/toybox-instlist
 
@@ -132,14 +139,13 @@ include $(CLEAR_VARS)
 ifeq ($(TW_USE_TOYBOX), true)
 
 utility_symlinks: $(TOYBOX_INSTLIST)
-utility_symlinks: TOYBOX_TOOLS=$(shell $(TOYBOX_INSTLIST))
-utility_symlinks: TOOLBOX_TOOLS_INSTALLED=$(filter-out $(TOYBOX_TOOLS), $(BSD_TOOLS) $(TOOLBOX_TOOLS))
+utility_symlinks: TOOLBOX_TOOLS_INSTALLED=$(BSD_TOOLS) $(TOOLBOX_TOOLS)
 utility_symlinks:
 	@mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/sbin
-	@echo -e ${CL_CYN}"Generate toybox links:"${CL_RST} $(TOYBOX_TOOLS)
-	$(hide) $(foreach t,$(TOYBOX_TOOLS),ln -sf toybox $(TARGET_RECOVERY_ROOT_OUT)/sbin/$(t);)
 	@echo -e ${CL_CYN}"Generate toolbox links:"${CL_RST} $(TOOLBOX_TOOLS_INSTALLED)
 	$(hide) $(foreach t,$(TOOLBOX_TOOLS_INSTALLED),ln -sf toolbox $(TARGET_RECOVERY_ROOT_OUT)/sbin/$(t);)
+	@echo -e ${CL_CYN}"Generate toybox links:"${CL_RST} $(TOYBOX_TOOLS)
+	$(hide) $(TOYBOX_INSTLIST) | xargs -I'{}' ln -sf toybox '$(TARGET_RECOVERY_ROOT_OUT)/sbin/{}'
 
 else
 
