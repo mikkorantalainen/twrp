@@ -82,6 +82,10 @@ LOCAL_SHARED_LIBRARIES := \
     libtar_twrp \
     libz
 
+ifeq ($(TW_USE_TOYBOX),)
+    TW_USE_TOYBOX := true
+endif
+
 ifeq ($(TW_OEM_BUILD),true)
     LOCAL_CFLAGS += -DTW_OEM_BUILD
     BOARD_HAS_NO_REAL_SDCARD := true
