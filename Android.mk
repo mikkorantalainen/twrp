@@ -360,8 +360,9 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libaosprecovery
 LOCAL_MODULE_TAGS := eng optional
-LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp bootloader.cpp legacy_property_service.c verifier.cpp set_metadata.c tw_atomic.cpp
-LOCAL_SHARED_LIBRARIES += libc liblog libcutils libmtdutils libfusesideload libselinux libcrypto
+LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp bootloader.cpp legacy_property_service.cpp verifier.cpp set_metadata.cpp tw_atomic.cpp
+LOCAL_SHARED_LIBRARIES += libc liblog libcutils libmtdutils libfusesideload libselinux libc++ libcrypto
+LOCAL_CFLAGS := -std=gnu++0x
 
 ifneq ($(BOARD_RECOVERY_BLDRMSG_OFFSET),)
     LOCAL_CFLAGS += -DBOARD_RECOVERY_BLDRMSG_OFFSET=$(BOARD_RECOVERY_BLDRMSG_OFFSET)

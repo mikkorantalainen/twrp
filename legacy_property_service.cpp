@@ -98,9 +98,9 @@ static int init_property_area(void)
 
     fcntl(pa_workspace.fd, F_SETFD, FD_CLOEXEC);
 
-    pa_info_array = (void*) (((char*) pa_workspace.data) + PA_INFO_START);
+    pa_info_array = (prop_info*) (((char*) pa_workspace.data) + PA_INFO_START);
 
-    pa = pa_workspace.data;
+    pa = (prop_area*)(pa_workspace.data);
     memset(pa, 0, PA_SIZE);
     pa->magic = PROP_AREA_MAGIC;
     pa->version = PROP_AREA_VERSION;

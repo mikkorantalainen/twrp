@@ -17,15 +17,7 @@
 #ifndef _LEGACY_PROPERTY_SERVICE_H
 #define _LEGACY_PROPERTY_SERVICE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void legacy_get_property_workspace(int *fd, int *sz);
 int legacy_properties_init();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _LEGACY_PROPERTY_SERVICE_H */

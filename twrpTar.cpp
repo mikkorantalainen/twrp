@@ -64,6 +64,9 @@ twrpTar::twrpTar(void) {
 	Total_Backup_Size = 0;
 	Archive_Current_Size = 0;
 	include_root_dir = true;
+	tar_type.openfunc = open;
+	tar_type.closefunc = close;
+	tar_type.readfunc = read;
 	input_fd = -1;
 	output_fd = -1;
 }
@@ -929,7 +932,7 @@ int twrpTar::createTar() {
 				close(pipes[3]);
 				fd = pipes[1];
 				init_libtar_no_buffer(progress_pipe_fd);
-				tar_type = { open, close, read, write_tar_no_buffer };
+				tar_type.writefunc = write_tar_no_buffer;
 				if (tar_fdopen(&t, fd, charRootDir, &tar_type, O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, TAR_GNU | TAR_STORE_SELINUX) != 0) {
 					close(fd);
 					LOGINFO("tar_fdopen failed\n");
@@ -983,7 +986,7 @@ int twrpTar::createTar() {
 			close(pigzfd[0]); // close parent input
 			fd = pigzfd[1];   // copy parent output
 			init_libtar_no_buffer(progress_pipe_fd);
-			tar_type = { open, close, read, write_tar_no_buffer };
+			tar_type.writefunc = write_tar_no_buffer;
 			if (tar_fdopen(&t, fd, charRootDir, &tar_type, O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, TAR_GNU | TAR_STORE_SELINUX) != 0) {
 				close(fd);
 				LOGINFO("tar_fdopen failed\n");
@@ -1033,7 +1036,7 @@ int twrpTar::createTar() {
 			close(oaesfd[0]); // close parent input
 			fd = oaesfd[1];   // copy parent output
 			init_libtar_no_buffer(progress_pipe_fd);
-			tar_type = { open, close, read, write_tar_no_buffer };
+			tar_type.writefunc = write_tar_no_buffer;
 			if (tar_fdopen(&t, fd, charRootDir, &tar_type, O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, TAR_GNU | TAR_STORE_SELINUX) != 0) {
 				close(fd);
 				LOGINFO("tar_fdopen failed\n");
@@ -1045,7 +1048,7 @@ int twrpTar::createTar() {
 	} else {
 		// Not compressed or encrypted
 		init_libtar_buffer(0, progress_pipe_fd);
-		tar_type = { open, close, read, write_tar };
+		tar_type.writefunc = write_tar;
 		if (tar_open(&t, charTarFile, &tar_type, O_WRONLY | O_CREAT | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, TAR_GNU | TAR_STORE_SELINUX) == -1) {
 			LOGINFO("tar_open error opening '%s'\n", tarfn.c_str());
 			gui_err("backup_error=Error creating backup.");
