@@ -5,8 +5,10 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
     dynarray.c \
     getprop.c \
+    lsof.c \
     setprop.c \
-    toolbox.c
+    toolbox.c \
+    watchprops.c
 
 LOCAL_CFLAGS += \
     -std=gnu99 \

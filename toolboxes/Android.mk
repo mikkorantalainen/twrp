@@ -90,31 +90,22 @@ endif
 #####################
 
 BSD_TOOLS := \
-    dd \
-    du
+    dd
 
 TOOLBOX_TOOLS := \
-    df \
     getevent \
     iftop \
     ioctl \
-    ionice \
     log \
-    ls \
-    lsof \
-    mount \
     nandread \
     newfs_msdos \
-    ps \
     prlimit \
-    renice \
+    ps \
     restart \
     sendevent \
     start \
     stop \
-    top \
-    uptime \
-    watchprops
+    top
 
 ###########################
 ##     micro.toolbox     ##
