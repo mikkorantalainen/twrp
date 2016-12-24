@@ -65,6 +65,7 @@ LOCAL_SHARED_LIBRARIES := \
     libaosprecovery \
     libbase \
     libblkid \
+    libbootloader_message \
     libc \
     libc++ \
     libcrecovery \
@@ -93,6 +94,10 @@ LOCAL_CFLAGS += \
     -g \
     -DUSE_EXT4 \
     -DHAVE_CAPABILITIES
+
+ifeq ($(AB_OTA_UPDATER),true)
+    LOCAL_CFLAGS += -DAB_OTA_UPDATER=1
+endif
 
 TWRES_PATH := /twres/
 LOCAL_CFLAGS += -DTWRES=\"$(TWRES_PATH)\"
@@ -239,6 +244,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := \
     fatlabel \
     flash_image \
     fsck.fat \
+    libbootloader_message \
     mke2fs.conf \
     mkfs.fat \
     permissive.sh \
@@ -360,7 +366,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libaosprecovery
 LOCAL_MODULE_TAGS := eng optional
-LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp bootloader.cpp legacy_property_service.cpp verifier.cpp set_metadata.cpp tw_atomic.cpp
+LOCAL_SRC_FILES := adb_install.cpp asn1_decoder.cpp legacy_property_service.cpp verifier.cpp set_metadata.cpp tw_atomic.cpp
 LOCAL_SHARED_LIBRARIES += libc liblog libcutils libmtdutils libfusesideload libselinux libc++ libcrypto
 LOCAL_CFLAGS := -std=gnu++0x
 
@@ -387,6 +393,7 @@ include $(LOCAL_PATH)/tests/Android.mk \
     $(LOCAL_PATH)/tools/Android.mk \
     $(LOCAL_PATH)/edify/Android.mk \
     $(LOCAL_PATH)/otafault/Android.mk \
+    $(LOCAL_PATH)/bootloader_message/Android.mk \
     $(LOCAL_PATH)/updater/Android.mk \
     $(LOCAL_PATH)/update_verifier/Android.mk \
     $(LOCAL_PATH)/applypatch/Android.mk
