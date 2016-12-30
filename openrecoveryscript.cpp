@@ -1,5 +1,5 @@
 /*
-	Copyright 2012 bigbiff/Dees_Troy TeamWin
+	Copyright 2016 TeamWin
 	This file is part of TWRP/TeamWin Recovery Project.
 
 	TWRP is free software: you can redistribute it and/or modify
@@ -132,6 +132,8 @@ int OpenRecoveryScript::run_script_file(void) {
 				// Wipe
 				if (strcmp(value, "cache") == 0 || strcmp(value, "/cache") == 0) {
 					PartitionManager.Wipe_By_Path("/cache");
+				} else if (strcmp(value, "system") == 0 || strcmp(value, "/system") == 0) {
+					PartitionManager.Wipe_By_Path("/system");
 				} else if (strcmp(value, "dalvik") == 0 || strcmp(value, "dalvick") == 0 || strcmp(value, "dalvikcache") == 0 || strcmp(value, "dalvickcache") == 0) {
 					PartitionManager.Wipe_Dalvik_Cache();
 				} else if (strcmp(value, "data") == 0 || strcmp(value, "/data") == 0 || strcmp(value, "factory") == 0 || strcmp(value, "factoryreset") == 0) {
@@ -273,6 +275,8 @@ int OpenRecoveryScript::run_script_file(void) {
 					ret_val = 1;
 				else
 					gui_msg("done=Done.");
+			} else if (strcmp(command, "remountrw") == 0) {
+				ret_val = remountrw();
 			} else if (strcmp(command, "mount") == 0) {
 				// Mount
 				DataManager::SetValue("tw_action_text2", gui_parse_text("{@mounting}"));
@@ -393,6 +397,7 @@ int OpenRecoveryScript::run_script_file(void) {
 		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(SCRIPT_FILE_TMP)(strerror(errno)));
 		return 1;
 	}
+
 	if (install_cmd && DataManager::GetIntValue(TW_HAS_INJECTTWRP) == 1 && DataManager::GetIntValue(TW_INJECT_AFTER_ZIP) == 1) {
 		gui_msg("injecttwrp=Injecting TWRP into boot image...");
 		TWPartition* Boot = PartitionManager.Find_Partition_By_Path("/boot");
@@ -643,4 +648,27 @@ void OpenRecoveryScript::Run_CLI_Command(const char* command) {
 	// let the GUI close the output fd and restart the command listener
 	call_after_cli_command();
 	LOGINFO("Done reading ORS command from command line\n");
+}
+
+int OpenRecoveryScript::remountrw(void)
+{
+	bool remount_system = PartitionManager.Is_Mounted_By_Path("/system");
+	int op_status;
+	TWPartition* Part;
+
+	if (!PartitionManager.UnMount_By_Path("/system", true)) {
+		op_status = 1; // fail
+	} else {
+		Part = PartitionManager.Find_Partition_By_Path("/system");
+		if (Part) {
+			DataManager::SetValue("tw_mount_system_ro", 0);
+			Part->Change_Mount_Read_Only(false);
+		}
+		if (remount_system) {
+			Part->Mount(true);
+		}
+		op_status = 0; // success
+	}
+
+	return op_status;
 }
