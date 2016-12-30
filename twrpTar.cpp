@@ -1408,7 +1408,7 @@ unsigned long long twrpTar::get_size() {
 			}
 		}
 #ifndef BUILD_TWRPTAR_MAIN
-		InfoManager backup_info(backup_folder + "/" + partition_name + ".info");
+		InfoManager backup_info(tarfn + ".info");
 		backup_info.SetValue("backup_size", total_restore_size);
 		backup_info.SetValue("backup_type", current_archive_type);
 		backup_info.SaveValues();
