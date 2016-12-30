@@ -10,7 +10,9 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES := \
 	external/zlib \
+	external/libselinux/include \
 	external/safe-iop/include
+
 
 LOCAL_MODULE := libminzip
 
@@ -34,6 +36,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES += \
 	external/zlib \
+	external/libselinux/include \
 	external/safe-iop/include
 
 LOCAL_MODULE := libminzip
