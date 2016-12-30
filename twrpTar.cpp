@@ -100,7 +100,7 @@ void twrpTar::Set_Archive_Type(Archive_Type archive_type) {
 	current_archive_type = archive_type;
 }
 
-int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
+int twrpTar::createTarFork(pid_t *tar_fork_pid) {
 	int status = 0;
 	pid_t rc_pid;
 	int progress_pipe[2], ret;
@@ -267,6 +267,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 				reg.use_compression = use_compression;
 				reg.split_archives = 1;
 				reg.progress_pipe_fd = progress_pipe_fd;
+				reg.part_settings = part_settings;
 				LOGINFO("Creating unencrypted backup...\n");
 				if (createList((void*)&reg) != 0) {
 					LOGINFO("Error creating unencrypted backup.\n");
@@ -310,6 +311,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 				enc[i].use_compression = use_compression;
 				enc[i].split_archives = 1;
 				enc[i].progress_pipe_fd = progress_pipe_fd;
+				enc[i].part_settings = part_settings;
 				LOGINFO("Start encryption thread %i\n", i);
 				ret = pthread_create(&enc_thread[i], &tattr, createList, (void*)&enc[i]);
 				if (ret) {
@@ -384,6 +386,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 			reg.use_compression = use_compression;
 			reg.setsize(Total_Backup_Size);
 			reg.progress_pipe_fd = progress_pipe_fd;
+			reg.part_settings = part_settings;
 			if (Total_Backup_Size > MAX_ARCHIVE_SIZE) {
 				gui_msg("split_backup=Breaking backup file into multiple archives...");
 				reg.split_archives = 1;
@@ -419,14 +422,14 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 			} else if (first_data == 1) {
 				// Second incoming data is total size
 				first_data = 2;
-				progress->SetSizeCount(fs, file_count);
+				part_settings->progress->SetSizeCount(fs, file_count);
 			} else {
 				if (fs > 0) {
 					size_backup += fs;
-					progress->UpdateSize(size_backup);
+					part_settings->progress->UpdateSize(size_backup);
 				} else { // fs == 0 increments the file counter
 					files_backup++;
-					progress->UpdateSizeCount(size_backup, files_backup);
+					part_settings->progress->UpdateSizeCount(size_backup, files_backup);
 				}
 			}
 		}
@@ -434,10 +437,10 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 #ifndef BUILD_TWRPTAR_MAIN
 		DataManager::SetValue("tw_file_progress", "");
 		DataManager::SetValue("tw_size_progress", "");
-		progress->DisplayFileCount(false);
-		progress->UpdateDisplayDetails(true);
+		part_settings->progress->DisplayFileCount(false);
+		part_settings->progress->UpdateDisplayDetails(true);
 
-		InfoManager backup_info(backup_folder + partition_name + ".info");
+		InfoManager backup_info(backup_folder + "/" + partition_name + ".info");
 		backup_info.SetValue("backup_size", size_backup);
 		if (use_compression && use_encryption)
 			backup_info.SetValue("backup_type", COMPRESSED_ENCRYPTED);
@@ -456,7 +459,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 	return 0;
 }
 
-int twrpTar::extractTarFork(ProgressTracking *progress) {
+int twrpTar::extractTarFork() {
 	int status = 0;
 	pid_t rc_pid, tar_fork_pid;
 	int progress_pipe[2], ret;
@@ -505,6 +508,7 @@ int twrpTar::extractTarFork(ProgressTracking *progress) {
 					tars[0].basefn = basefn;
 					tars[0].thread_id = 0;
 					tars[0].progress_pipe_fd = progress_pipe_fd;
+					tars[0].part_settings = part_settings;
 					if (extractMulti((void*)&tars[0]) != 0) {
 						LOGINFO("Error extracting split archive.\n");
 						gui_err("restore_error=Error during restore process.");
@@ -546,6 +550,7 @@ int twrpTar::extractTarFork(ProgressTracking *progress) {
 						tars[i].setpassword(password);
 						tars[i].thread_id = i;
 						tars[i].progress_pipe_fd = progress_pipe_fd;
+						tars[i].part_settings = part_settings;
 						LOGINFO("Creating extract thread ID %i\n", i);
 						ret = pthread_create(&tar_thread[i], &tattr, extractMulti, (void*)&tars[i]);
 						if (ret) {
@@ -607,10 +612,10 @@ int twrpTar::extractTarFork(ProgressTracking *progress) {
 			// Read progress data from children
 			while (read(progress_pipe[0], &fs, sizeof(fs)) > 0) {
 				size_backup += fs;
-				progress->UpdateSize(size_backup);
+				part_settings->progress->UpdateSize(size_backup);
 			}
 			close(progress_pipe[0]);
-			progress->UpdateDisplayDetails(true);
+			part_settings->progress->UpdateDisplayDetails(true);
 
 			if (TWFunc::Wait_For_Child(tar_fork_pid, &status, "extractTarFork()") != 0)
 				return -1;

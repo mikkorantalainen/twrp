@@ -25,6 +25,7 @@
 
 #include "exclude.hpp"
 #include "libtar/libtar.h"
+#include "partitions.hpp"
 #include "progresstracking.hpp"
 
 using namespace std;
@@ -43,8 +44,8 @@ class twrpTar {
 public:
 	twrpTar();
 	virtual ~twrpTar();
-	int createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid);
-	int extractTarFork(ProgressTracking *progress);
+	int createTarFork(pid_t *tar_fork_pid);
+	int extractTarFork();
 	void setfn(string fn);
 	void setdir(string dir);
 	void setsize(unsigned long long backup_size);
@@ -62,6 +63,7 @@ public:
 	int progress_pipe_fd;
 	string partition_name;
 	string backup_folder;
+	PartitionSettings *part_settings;
 	TWExclude *backup_exclusions;
 
 private:

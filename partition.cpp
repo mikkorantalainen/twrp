@@ -1143,6 +1143,7 @@ bool TWPartition::Mount(bool Display_Error) {
 		else
 			cmd = "/sbin/mount.ntfs " + Actual_Block_Device + " " + Mount_Point;
 		LOGINFO("cmd: '%s'\n", cmd.c_str());
+
 		if (TWFunc::Exec_Cmd(cmd) == 0) {
 			return true;
 		} else {
@@ -1566,19 +1567,18 @@ bool TWPartition::Resize() {
 	return false;
 }
 
-bool TWPartition::Backup(const string& backup_folder, pid_t *tar_fork_pid, ProgressTracking *progress) {
-	if (Backup_Method == BM_FILES) {
-		return Backup_Tar(backup_folder, progress, tar_fork_pid);
-	}
+bool TWPartition::Backup(PartitionSettings *part_settings, pid_t *tar_fork_pid) {
+	if (Backup_Method == BM_FILES)
+		return Backup_Tar(part_settings, tar_fork_pid);
 	else if (Backup_Method == BM_DD)
-		return Backup_Image(backup_folder, progress);
+		return Backup_Image(part_settings);
 	else if (Backup_Method == BM_FLASH_UTILS)
-		return Backup_Dump_Image(backup_folder, progress);
+		return Backup_Dump_Image(part_settings);
 	LOGERR("Unknown backup method for '%s'\n", Mount_Point.c_str());
 	return false;
 }
 
-bool TWPartition::Check_MD5(string restore_folder) {
+bool TWPartition::Check_MD5(PartitionSettings *part_settings) {
 	string Full_Filename, md5file;
 	char split_filename[512];
 	int index = 0;
@@ -1587,7 +1587,7 @@ bool TWPartition::Check_MD5(string restore_folder) {
 	sync();
 
 	memset(split_filename, 0, sizeof(split_filename));
-	Full_Filename = restore_folder + "/" + Backup_FileName;
+	Full_Filename = part_settings->Backup_Folder + "/" + Backup_FileName;
 	if (!TWFunc::Path_Exists(Full_Filename)) {
 		// This is a split archive, we presume
 		sprintf(split_filename, "%s%03i", Full_Filename.c_str(), index);
@@ -1613,7 +1613,7 @@ bool TWPartition::Check_MD5(string restore_folder) {
 		// Single file archive
 		md5file = Full_Filename + ".md5";
 		if (!TWFunc::Path_Exists(md5file)) {
-			gui_msg(Msg(msg::kError, "no_md5_found=No md5 file found for '{1}'. Please unselect Enable MD5 verification to restore.")(split_filename));
+			gui_msg(Msg(msg::kError, "no_md5_found=No md5 file found for '{1}'. Please unselect Enable MD5 verification to restore.")(md5file));
 			return false;
 		}
 		md5sum.setfn(Full_Filename);
@@ -1626,25 +1626,22 @@ bool TWPartition::Check_MD5(string restore_folder) {
 	return false;
 }
 
-bool TWPartition::Restore(const string& restore_folder, ProgressTracking *progress) {
-	string Restore_File_System;
-
+bool TWPartition::Restore(PartitionSettings *part_settings) {
 	TWFunc::GUI_Operation_Text(TW_RESTORE_TEXT, Display_Name, gui_parse_text("{@restoring_hdr}"));
-	LOGINFO("Restore filename is: %s\n", Backup_FileName.c_str());
+	LOGINFO("Restore filename is: %s/%s\n", part_settings->Backup_Folder.c_str(), Backup_FileName.c_str());
 
-	Restore_File_System = Get_Restore_File_System(restore_folder);
+	string Restore_File_System = Get_Restore_File_System(part_settings);
 
 	if (Is_File_System(Restore_File_System))
-		return Restore_Tar(restore_folder, Restore_File_System, progress);
-	else if (Is_Image(Restore_File_System)) {
-		return Restore_Image(restore_folder, Restore_File_System, progress);
-	}
+		return Restore_Tar(part_settings);
+	else if (Is_Image(Restore_File_System))
+		return Restore_Image(part_settings);
 
 	LOGERR("Unknown restore method for '%s'\n", Mount_Point.c_str());
 	return false;
 }
 
-string TWPartition::Get_Restore_File_System(const string& restore_folder) {
+string TWPartition::Get_Restore_File_System(PartitionSettings *part_settings) {
 	size_t first_period, second_period;
 	string Restore_File_System;
 
@@ -2104,7 +2101,7 @@ bool TWPartition::Wipe_Data_Without_Wiping_Media_Func(const string& parent __unu
 	return false;
 }
 
-bool TWPartition::Backup_Tar(const string& backup_folder, ProgressTracking *progress, pid_t *tar_fork_pid) {
+bool TWPartition::Backup_Tar(PartitionSettings *part_settings, pid_t *tar_fork_pid) {
 	string Full_FileName;
 	twrpTar tar;
 
@@ -2132,72 +2129,84 @@ bool TWPartition::Backup_Tar(const string& backup_folder, ProgressTracking *prog
 #endif
 
 	Backup_FileName = Backup_Name + "." + Current_File_System + ".win";
-	Full_FileName = backup_folder + "/" + Backup_FileName;
+	Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
 	tar.has_data_media = Has_Data_Media;
-	Full_FileName = backup_folder + "/" + Backup_FileName;
+	tar.part_settings = part_settings;
 	tar.backup_exclusions = &backup_exclusions;
 	tar.setdir(Backup_Path);
 	tar.setfn(Full_FileName);
 	tar.setsize(Backup_Size);
 	tar.partition_name = Backup_Name;
-	tar.backup_folder = backup_folder;
-	if (tar.createTarFork(progress, tar_fork_pid) != 0)
+	tar.backup_folder = part_settings->Backup_Folder;
+	if (tar.createTarFork(tar_fork_pid) != 0)
 		return false;
 	return true;
 }
 
-bool TWPartition::Backup_Image(const string& backup_folder, ProgressTracking *progress) {
+bool TWPartition::Backup_Image(PartitionSettings *part_settings) {
 	string Full_FileName;
 
 	TWFunc::GUI_Operation_Text(TW_BACKUP_TEXT, Display_Name, gui_parse_text("{@backing}"));
 	gui_msg(Msg("backing_up=Backing up {1}...")(Backup_Display_Name));
 
 	Backup_FileName = Backup_Name + "." + Current_File_System + ".win";
-	Full_FileName = backup_folder + "/" + Backup_FileName;
+	Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
 
-	if (!Raw_Read_Write(Actual_Block_Device, Full_FileName, Backup_Size, progress))
+	part_settings->total_restore_size = Backup_Size;
+
+	if (!Raw_Read_Write(part_settings))
 		return false;
 
-	tw_set_default_metadata(Full_FileName.c_str());
-	if (TWFunc::Get_File_Size(Full_FileName) == 0) {
-		gui_msg(Msg(msg::kError, "backup_size=Backup file size for '{1}' is 0 bytes.")(Full_FileName));
-		return false;
-	}
 	return true;
 }
 
-bool TWPartition::Raw_Read_Write(const string& input_file, const string& output_file, const unsigned long long input_size, ProgressTracking *progress) {
-	unsigned long long RW_Block_Size, Remain;
-	int src_fd = -1, dest_fd = -1, bs;
+bool TWPartition::Raw_Read_Write(PartitionSettings *part_settings) {
+	unsigned long long RW_Block_Size, Remain = Backup_Size;
+	int src_fd = -1, dest_fd = -1;
+	ssize_t bs;
 	bool ret = false;
 	void* buffer = NULL;
 	unsigned long long backedup_size = 0;
+	string srcfn, destfn;
 
-	RW_Block_Size = 1048576LLU; // 1MB
-	Remain = input_size;
+	if (part_settings->PM_Method == PM_BACKUP) {
+		srcfn = Actual_Block_Device;
+		destfn = part_settings->Backup_Folder + "/" + Backup_FileName;
+	} else {
+		destfn = Actual_Block_Device;
+		srcfn = part_settings->Backup_Folder + "/" + Backup_FileName;
+		Remain = TWFunc::Get_File_Size(srcfn);
+	}
 
-	src_fd = open(input_file.c_str(), O_RDONLY | O_LARGEFILE);
+	src_fd = open(srcfn.c_str(), O_RDONLY | O_LARGEFILE);
 	if (src_fd < 0) {
-		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(input_file)(strerror(errno)));
+		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(srcfn.c_str())(strerror(errno)));
 		return false;
 	}
-	dest_fd = open(output_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, S_IRUSR | S_IWUSR);
+
+	dest_fd = open(destfn.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, S_IRUSR | S_IWUSR);
 	if (dest_fd < 0) {
-		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(output_file)(strerror(errno)));
+		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(destfn.c_str())(strerror(errno)));
 		goto exit;
 	}
-	bs = (int)(RW_Block_Size);
+	
+	LOGINFO("Reading '%s', writing '%s'\n", srcfn.c_str(), destfn.c_str());
+
+	RW_Block_Size = 1048576LLU; // 1MB
+	bs = (ssize_t)(RW_Block_Size);
+
 	buffer = malloc((size_t)bs);
 	if (!buffer) {
 		LOGINFO("Raw_Read_Write failed to malloc\n");
 		goto exit;
 	}
-	LOGINFO("Reading '%s', writing '%s'\n", input_file.c_str(), output_file.c_str());
-	if (progress)
-		progress->SetPartitionSize(input_size);
+
+	if (part_settings->progress)
+		part_settings->progress->SetPartitionSize(part_settings->total_restore_size);
+
 	while (Remain > 0) {
 		if (Remain < RW_Block_Size)
-			bs = (int)(Remain);
+			bs = (ssize_t)(Remain);
 		if (read(src_fd, buffer, bs) != bs) {
 			LOGINFO("Error reading source fd (%s)\n", strerror(errno));
 			goto exit;
@@ -2208,13 +2217,13 @@ bool TWPartition::Raw_Read_Write(const string& input_file, const string& output_
 		}
 		backedup_size += (unsigned long long)(bs);
 		Remain -= (unsigned long long)(bs);
-		if (progress)
-			progress->UpdateSize(backedup_size);
+		if (part_settings->progress)
+			part_settings->progress->UpdateSize(backedup_size);
 		if (PartitionManager.Check_Backup_Cancel() != 0)
 			goto exit;
 	}
-	if (progress)
-		progress->UpdateDisplayDetails(true);
+	if (part_settings->progress)
+		part_settings->progress->UpdateDisplayDetails(true);
 	fsync(dest_fd);
 	ret = true;
 exit:
@@ -2227,19 +2236,20 @@ exit:
 	return ret;
 }
 
-bool TWPartition::Backup_Dump_Image(const string& backup_folder, ProgressTracking *progress) {
+bool TWPartition::Backup_Dump_Image(PartitionSettings *part_settings) {
 	string Full_FileName, Command;
 
 	TWFunc::GUI_Operation_Text(TW_BACKUP_TEXT, Display_Name, gui_parse_text("{@backing}"));
 	gui_msg(Msg("backing_up=Backing up {1}...")(Backup_Display_Name));
 
-	if (progress)
-		progress->SetPartitionSize(Backup_Size);
+	if (part_settings->progress)
+		part_settings->progress->SetPartitionSize(Backup_Size);
 
 	Backup_FileName = Backup_Name + "." + Current_File_System + ".win";
-	Full_FileName = backup_folder + "/" + Backup_FileName;
+	Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
 
 	Command = "dump_image " + MTD_Name + " '" + Full_FileName + "'";
+
 	LOGINFO("Backup command: '%s'\n", Command.c_str());
 	TWFunc::Exec_Cmd(Command);
 	tw_set_default_metadata(Full_FileName.c_str());
@@ -2248,22 +2258,23 @@ bool TWPartition::Backup_Dump_Image(const string& backup_folder, ProgressTrackin
 		gui_msg(Msg(msg::kError, "backup_size=Backup file size for '{1}' is 0 bytes.")(Full_FileName));
 		return false;
 	}
-	if (progress)
-		progress->UpdateSize(Backup_Size);
+	if (part_settings->progress)
+		part_settings->progress->UpdateSize(Backup_Size);
+
 	return true;
 }
 
-unsigned long long TWPartition::Get_Restore_Size(const string& restore_folder) {
-	InfoManager restore_info(restore_folder + "/" + Backup_Name + ".info");
+unsigned long long TWPartition::Get_Restore_Size(PartitionSettings *part_settings) {
+	InfoManager restore_info(part_settings->Backup_Folder + "/" + Backup_Name + ".info");
 	if (restore_info.LoadValues() == 0) {
 		if (restore_info.GetValue("backup_size", Restore_Size) == 0) {
 			LOGINFO("Read info file, restore size is %llu\n", Restore_Size);
 			return Restore_Size;
 		}
 	}
-	string Full_FileName, Restore_File_System = Get_Restore_File_System(restore_folder);
 
-	Full_FileName = restore_folder + "/" + Backup_FileName;
+	string Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
+	string Restore_File_System = Get_Restore_File_System(part_settings);
 
 	if (Is_Image(Restore_File_System)) {
 		Restore_Size = TWFunc::Get_File_Size(Full_FileName);
@@ -2273,7 +2284,7 @@ unsigned long long TWPartition::Get_Restore_Size(const string& restore_folder) {
 	twrpTar tar;
 	tar.setdir(Backup_Path);
 	tar.setfn(Full_FileName);
-	tar.backup_name = Backup_Name;
+	tar.backup_name = Full_FileName;
 #ifndef TW_EXCLUDE_ENCRYPTED_BACKUPS
 	string Password;
 	DataManager::GetValue("tw_restore_password", Password);
@@ -2281,14 +2292,16 @@ unsigned long long TWPartition::Get_Restore_Size(const string& restore_folder) {
 		tar.setpassword(Password);
 #endif
 	tar.partition_name = Backup_Name;
-	tar.backup_folder = restore_folder;
+	tar.backup_folder = part_settings->Backup_Folder;
+	tar.part_settings = part_settings;
 	Restore_Size = tar.get_size();
 	return Restore_Size;
 }
 
-bool TWPartition::Restore_Tar(const string& restore_folder, const string& Restore_File_System, ProgressTracking *progress) {
+bool TWPartition::Restore_Tar(PartitionSettings *part_settings) {
 	string Full_FileName;
 	bool ret = false;
+	string Restore_File_System = Get_Restore_File_System(part_settings);
 
 	if (Has_Android_Secure) {
 		if (!Wipe_AndSec())
@@ -2311,8 +2324,9 @@ bool TWPartition::Restore_Tar(const string& restore_folder, const string& Restor
 	if (!ReMount_RW(true))
 		return false;
 
-	Full_FileName = restore_folder + "/" + Backup_FileName;
+	Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
 	twrpTar tar;
+	tar.part_settings = part_settings;
 	tar.setdir(Backup_Path);
 	tar.setfn(Full_FileName);
 	tar.backup_name = Backup_Name;
@@ -2322,8 +2336,8 @@ bool TWPartition::Restore_Tar(const string& restore_folder, const string& Restor
 	if (!Password.empty())
 		tar.setpassword(Password);
 #endif
-	progress->SetPartitionSize(Get_Restore_Size(restore_folder));
-	if (tar.extractTarFork(progress) != 0)
+	part_settings->progress->SetPartitionSize(Get_Restore_Size(part_settings));
+	if (tar.extractTarFork() != 0)
 		ret = false;
 	else
 		ret = true;
@@ -2353,19 +2367,20 @@ bool TWPartition::Restore_Tar(const string& restore_folder, const string& Restor
 	return ret;
 }
 
-bool TWPartition::Restore_Image(const string& restore_folder, const string& Restore_File_System, ProgressTracking *progress) {
+bool TWPartition::Restore_Image(PartitionSettings *part_settings) {
 	string Full_FileName;
+	string Restore_File_System = Get_Restore_File_System(part_settings);
 
 	TWFunc::GUI_Operation_Text(TW_RESTORE_TEXT, Backup_Display_Name, gui_parse_text("{@restoring_hdr}"));
 	gui_msg(Msg("restoring=Restoring {1}...")(Backup_Display_Name));
-	Full_FileName = restore_folder + "/" + Backup_FileName;
+	Full_FileName = part_settings->Backup_Folder + "/" + Backup_FileName;
 
 	if (Restore_File_System == "emmc") {
-		unsigned long long file_size = (unsigned long long)(TWFunc::Get_File_Size(Full_FileName));
-		if (!Raw_Read_Write(Full_FileName, Actual_Block_Device, file_size, progress))
+		part_settings->total_restore_size = (uint64_t)(TWFunc::Get_File_Size(Full_FileName));
+		if (!Raw_Read_Write(part_settings))
 			return false;
 	} else if (Restore_File_System == "mtd" || Restore_File_System == "bml") {
-		if (!Flash_Image_FI(Full_FileName, progress))
+		if (!Flash_Image_FI(Full_FileName, part_settings->progress))
 			return false;
 	}
 	return true;
@@ -2503,10 +2518,12 @@ uint64_t TWPartition::Get_Max_FileSize() {
 	return maxFileSize - 1;
 }
 
-bool TWPartition::Flash_Image(const string& Filename) {
-	string Restore_File_System;
+bool TWPartition::Flash_Image(PartitionSettings *part_settings) {
+	string Restore_File_System, full_filename;
 
-	LOGINFO("Image filename is: %s\n", Filename.c_str());
+	full_filename = part_settings->Backup_Folder + "/" + Backup_FileName;
+
+	LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
 
 	if (Backup_Method == BM_FILES) {
 		LOGERR("Cannot flash images to file systems\n");
@@ -2519,22 +2536,21 @@ bool TWPartition::Flash_Image(const string& Filename) {
 			LOGERR("Unable to find partition size for '%s'\n", Mount_Point.c_str());
 			return false;
 		}
-		unsigned long long image_size = TWFunc::Get_File_Size(Filename);
+		unsigned long long image_size = TWFunc::Get_File_Size(full_filename);
 		if (image_size > Size) {
 			LOGINFO("Size (%llu bytes) of image '%s' is larger than target device '%s' (%llu bytes)\n",
-				image_size, Filename.c_str(), Actual_Block_Device.c_str(), Size);
+				image_size, Backup_FileName.c_str(), Actual_Block_Device.c_str(), Size);
 			gui_err("img_size_err=Size of image is larger than target device");
 			return false;
 		}
 		if (Backup_Method == BM_DD) {
-			if (Is_Sparse_Image(Filename)) {
-				return Flash_Sparse_Image(Filename);
+			if (Is_Sparse_Image(full_filename)) {
+				return Flash_Sparse_Image(full_filename);
 			}
-			unsigned long long file_size = (unsigned long long)(TWFunc::Get_File_Size(Filename));
-			ProgressTracking pt(file_size);
-			return Raw_Read_Write(Filename, Actual_Block_Device, file_size, &pt);
+			unsigned long long file_size = (unsigned long long)(TWFunc::Get_File_Size(full_filename));
+			return Raw_Read_Write(part_settings);
 		} else if (Backup_Method == BM_FLASH_UTILS) {
-			return Flash_Image_FI(Filename, NULL);
+			return Flash_Image_FI(full_filename, NULL);
 		}
 	}
 
@@ -2595,6 +2611,10 @@ bool TWPartition::Flash_Image_FI(const string& Filename, ProgressTracking *progr
 
 void TWPartition::Change_Mount_Read_Only(bool new_value) {
 	Mount_Read_Only = new_value;
+}
+
+bool TWPartition::Is_Read_Only() {
+	return Mount_Read_Only;
 }
 
 int TWPartition::Check_Lifetime_Writes() {
