@@ -6,7 +6,7 @@ minadbd_cflags := \
     -Wall -Werror \
     -Wno-unused-parameter \
     -Wno-missing-field-initializers \
-    -DADB_HOST=0 \
+    -DADB_HOST=0
 
 include $(CLEAR_VARS)
 
