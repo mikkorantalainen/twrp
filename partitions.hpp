@@ -169,7 +169,7 @@ public:
 	bool Repair();                                                            // Repairs the current file system
 	bool Can_Resize();                                                        // Checks to see if we have everything needed to be able to resize the current file system
 	bool Resize();                                                            // Resizes the current file system
-	bool Backup(const string& backup_folder, pid_t &tar_fork_pid, ProgressTracking *progress); // Backs up the partition to the folder specified
+	bool Backup(const string& backup_folder, pid_t *tar_fork_pid, ProgressTracking *progress); // Backs up the partition to the folder specified
 	bool Check_MD5(string restore_folder);                                    // Checks MD5 of a backup
 	bool Restore(const string& restore_folder, ProgressTracking *progress);   // Restores the partition using the backup folder provided
 	unsigned long long Get_Restore_Size(const string& restore_folder);        // Returns the overall restore size of the backup
@@ -229,7 +229,7 @@ private:
 	bool Wipe_NTFS();                                                         // Uses mkntfs to wipe
 	bool Wipe_Data_Without_Wiping_Media();                                    // Uses rm -rf to wipe but does not wipe /data/media
 	bool Wipe_Data_Without_Wiping_Media_Func(const string& parent);           // Uses rm -rf to wipe but does not wipe /data/media
-	bool Backup_Tar(const string& backup_folder, ProgressTracking *progress, pid_t &tar_fork_pid); // Backs up using tar for file systems
+	bool Backup_Tar(const string& backup_folder, ProgressTracking *progress, pid_t *tar_fork_pid); // Backs up using tar for file systems
 	bool Backup_Image(const string& backup_folder, ProgressTracking *progress); // Backs up using raw read/write for emmc memory types
 	bool Raw_Read_Write(const string& input_file, const string& output_file, const unsigned long long input_size, ProgressTracking *progress);
 	bool Backup_Dump_Image(const string& backup_folder, ProgressTracking *progress); // Backs up using dump_image for MTD memory types
@@ -380,7 +380,7 @@ private:
 	pid_t mtppid;
 	bool mtp_was_enabled;
 	int mtp_write_fd;
-	pid_t tar_fork_pid;
+	pid_t tar_fork_pid;                                                       // PID of twrpTar fork
 
 private:
 	std::vector<TWPartition*> Partitions;                                     // Vector list of all partitions

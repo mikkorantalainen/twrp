@@ -100,9 +100,9 @@ void twrpTar::Set_Archive_Type(Archive_Type archive_type) {
 	current_archive_type = archive_type;
 }
 
-int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
+int twrpTar::createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid) {
 	int status = 0;
-	pid_t rc_pid, tar_fork_pid;
+	pid_t rc_pid;
 	int progress_pipe[2], ret;
 
 	file_count = 0;
@@ -116,7 +116,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 		gui_err("backup_error=Error creating backup.");
 		return -1;
 	}
-	if ((tar_fork_pid = fork()) == -1) {
+	if ((*tar_fork_pid = fork()) == -1) {
 		LOGINFO("create tar failed to fork.\n");
 		gui_err("backup_error=Error creating backup.");
 		close(progress_pipe[0]);
@@ -124,7 +124,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 		return -1;
 	}
 
-	if (tar_fork_pid == 0) {
+	if (*tar_fork_pid == 0) {
 		// Child process
 		// Child closes input side of progress pipe
 		signal(SIGUSR2, twrpTar::Signal_Kill);
@@ -406,8 +406,6 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 		unsigned long long fs, size_backup = 0, files_backup = 0, file_count = 0;
 		int first_data = 0;
 
-		fork_pid = tar_fork_pid;
-
 		// Parent closes output side
 		close(progress_pipe[1]);
 
@@ -452,7 +450,7 @@ int twrpTar::createTarFork(ProgressTracking *progress, pid_t &fork_pid) {
 		backup_info.SetValue("file_count", files_backup);
 		backup_info.SaveValues();
 #endif //ndef BUILD_TWRPTAR_MAIN
-		if (TWFunc::Wait_For_Child(tar_fork_pid, &status, "createTarFork()") != 0)
+		if (TWFunc::Wait_For_Child(*tar_fork_pid, &status, "createTarFork()") != 0)
 			return -1;
 	}
 	return 0;

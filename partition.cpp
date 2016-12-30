@@ -1566,7 +1566,7 @@ bool TWPartition::Resize() {
 	return false;
 }
 
-bool TWPartition::Backup(const string& backup_folder, pid_t &tar_fork_pid, ProgressTracking *progress) {
+bool TWPartition::Backup(const string& backup_folder, pid_t *tar_fork_pid, ProgressTracking *progress) {
 	if (Backup_Method == FILES) {
 		return Backup_Tar(backup_folder, progress, tar_fork_pid);
 	}
@@ -2104,7 +2104,7 @@ bool TWPartition::Wipe_Data_Without_Wiping_Media_Func(const string& parent __unu
 	return false;
 }
 
-bool TWPartition::Backup_Tar(const string& backup_folder, ProgressTracking *progress, pid_t &tar_fork_pid) {
+bool TWPartition::Backup_Tar(const string& backup_folder, ProgressTracking *progress, pid_t *tar_fork_pid) {
 	string Full_FileName;
 	twrpTar tar;
 

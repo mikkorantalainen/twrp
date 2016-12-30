@@ -63,7 +63,6 @@ TWPartitionManager::TWPartitionManager(void) {
 	mtp_was_enabled = false;
 	mtp_write_fd = -1;
 	stop_backup.set_value(0);
-	tar_fork_pid = 0;
 }
 
 int TWPartitionManager::Process_Fstab(string Fstab_Filename, bool Display_Error) {
@@ -547,14 +546,14 @@ bool TWPartitionManager::Backup_Partition(TWPartition* Part, const string& Backu
 	TWFunc::SetPerformanceMode(true);
 	time(&start);
 
-	if (Part->Backup(Backup_Folder, tar_fork_pid, progress)) {
+	if (Part->Backup(Backup_Folder, &tar_fork_pid, progress)) {
 		bool md5Success = false;
 		if (Part->Has_SubPartition) {
 			std::vector<TWPartition*>::iterator subpart;
 
 			for (subpart = Partitions.begin(); subpart != Partitions.end(); subpart++) {
 				if ((*subpart)->Can_Be_Backed_Up && (*subpart)->Is_SubPartition && (*subpart)->SubPartition_Of == Part->Mount_Point) {
-					if (!(*subpart)->Backup(Backup_Folder, tar_fork_pid, progress)) {
+					if (!(*subpart)->Backup(Backup_Folder, &tar_fork_pid, progress)) {
 						TWFunc::SetPerformanceMode(false);
 						Clean_Backup_Folder(Backup_Folder);
 						TWFunc::copy_file("/tmp/recovery.log", backup_log, 0644);

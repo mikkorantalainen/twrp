@@ -43,7 +43,7 @@ class twrpTar {
 public:
 	twrpTar();
 	virtual ~twrpTar();
-	int createTarFork(ProgressTracking *progress, pid_t &fork_pid);
+	int createTarFork(ProgressTracking *progress, pid_t *tar_fork_pid);
 	int extractTarFork(ProgressTracking *progress);
 	void setfn(string fn);
 	void setdir(string dir);
