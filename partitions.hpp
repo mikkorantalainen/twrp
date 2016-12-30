@@ -139,17 +139,16 @@ const struct flag_list fs_mgr_flags[] = {
 	{ 0,              0 },
 };
 
+enum Backup_Method_enum {
+	BM_NONE = 0,
+	BM_FILES = 1,
+	BM_DD = 2,
+	BM_FLASH_UTILS = 3,
+};
+
 // Partition class
 class TWPartition
 {
-public:
-	enum Backup_Method_enum {
-		NONE = 0,
-		FILES = 1,
-		DD = 2,
-		FLASH_UTILS = 3,
-	};
-
 public:
 	TWPartition();
 	virtual ~TWPartition();
@@ -381,6 +380,7 @@ private:
 	bool mtp_was_enabled;
 	int mtp_write_fd;
 	pid_t tar_fork_pid;                                                       // PID of twrpTar fork
+	Backup_Method_enum Backup_Method;                                         // Method used for backup
 
 private:
 	std::vector<TWPartition*> Partitions;                                     // Vector list of all partitions

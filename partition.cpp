@@ -119,7 +119,7 @@ TWPartition::TWPartition() {
 	Backup_Name = "";
 	Backup_FileName = "";
 	MTD_Name = "";
-	Backup_Method = NONE;
+	Backup_Method = BM_NONE;
 	Can_Encrypt_Backup = false;
 	Use_Userdata_Encryption = false;
 	Has_Data_Media = false;
@@ -776,16 +776,16 @@ void TWPartition::Setup_File_System(bool Display_Error) {
 	Make_Dir(Mount_Point, Display_Error);
 	Display_Name = Mount_Point.substr(1, Mount_Point.size() - 1);
 	Backup_Name = Display_Name;
-	Backup_Method = FILES;
+	Backup_Method = BM_FILES;
 }
 
 void TWPartition::Setup_Image(bool Display_Error) {
 	Display_Name = Mount_Point.substr(1, Mount_Point.size() - 1);
 	Backup_Name = Display_Name;
 	if (Current_File_System == "emmc")
-		Backup_Method = DD;
+		Backup_Method = BM_DD;
 	else if (Current_File_System == "mtd" || Current_File_System == "bml")
-		Backup_Method = FLASH_UTILS;
+		Backup_Method = BM_FLASH_UTILS;
 	else
 		LOGINFO("Unhandled file system '%s' on image '%s'\n", Current_File_System.c_str(), Display_Name.c_str());
 	if (Find_Partition_Size()) {
@@ -1567,12 +1567,12 @@ bool TWPartition::Resize() {
 }
 
 bool TWPartition::Backup(const string& backup_folder, pid_t *tar_fork_pid, ProgressTracking *progress) {
-	if (Backup_Method == FILES) {
+	if (Backup_Method == BM_FILES) {
 		return Backup_Tar(backup_folder, progress, tar_fork_pid);
 	}
-	else if (Backup_Method == DD)
+	else if (Backup_Method == BM_DD)
 		return Backup_Image(backup_folder, progress);
-	else if (Backup_Method == FLASH_UTILS)
+	else if (Backup_Method == BM_FLASH_UTILS)
 		return Backup_Dump_Image(backup_folder, progress);
 	LOGERR("Unknown backup method for '%s'\n", Mount_Point.c_str());
 	return false;
@@ -1666,13 +1666,13 @@ string TWPartition::Get_Restore_File_System(const string& restore_folder) {
 }
 
 string TWPartition::Backup_Method_By_Name() {
-	if (Backup_Method == NONE)
+	if (Backup_Method == BM_NONE)
 		return "none";
-	else if (Backup_Method == FILES)
+	else if (Backup_Method == BM_FILES)
 		return "files";
-	else if (Backup_Method == DD)
+	else if (Backup_Method == BM_DD)
 		return "dd";
-	else if (Backup_Method == FLASH_UTILS)
+	else if (Backup_Method == BM_FLASH_UTILS)
 		return "flash_utils";
 	else
 		return "undefined";
@@ -2508,7 +2508,7 @@ bool TWPartition::Flash_Image(const string& Filename) {
 
 	LOGINFO("Image filename is: %s\n", Filename.c_str());
 
-	if (Backup_Method == FILES) {
+	if (Backup_Method == BM_FILES) {
 		LOGERR("Cannot flash images to file systems\n");
 		return false;
 	} else if (!Can_Flash_Img) {
@@ -2526,14 +2526,14 @@ bool TWPartition::Flash_Image(const string& Filename) {
 			gui_err("img_size_err=Size of image is larger than target device");
 			return false;
 		}
-		if (Backup_Method == DD) {
+		if (Backup_Method == BM_DD) {
 			if (Is_Sparse_Image(Filename)) {
 				return Flash_Sparse_Image(Filename);
 			}
 			unsigned long long file_size = (unsigned long long)(TWFunc::Get_File_Size(Filename));
 			ProgressTracking pt(file_size);
 			return Raw_Read_Write(Filename, Actual_Block_Device, file_size, &pt);
-		} else if (Backup_Method == FLASH_UTILS) {
+		} else if (Backup_Method == BM_FLASH_UTILS) {
 			return Flash_Image_FI(Filename, NULL);
 		}
 	}
@@ -2549,6 +2549,7 @@ bool TWPartition::Is_Sparse_Image(const string& Filename) {
 		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(Filename)(strerror(errno)));
 		return false;
 	}
+
 	if (read(fd, &magic, sizeof(magic)) != sizeof(magic)) {
 		gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(Filename)(strerror(errno)));
 		close(fd);

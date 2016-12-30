@@ -572,7 +572,7 @@ bool TWPartitionManager::Backup_Partition(TWPartition* Part, const string& Backu
 		time(&stop);
 		int backup_time = (int) difftime(stop, start);
 		LOGINFO("Partition Backup time: %d\n", backup_time);
-		if (Part->Backup_Method == 1) {
+		if (Part->Backup_Method == BM_FILES) {
 			*file_time += backup_time;
 		} else {
 			*img_time += backup_time;
@@ -696,7 +696,7 @@ int TWPartitionManager::Run_Backup(void) {
 			backup_part = Find_Partition_By_Path(backup_path);
 			if (backup_part != NULL) {
 				partition_count++;
-				if (backup_part->Backup_Method == 1)
+				if (backup_part->Backup_Method == BM_FILES)
 					file_bytes += backup_part->Backup_Size;
 				else
 					img_bytes += backup_part->Backup_Size;
@@ -706,7 +706,7 @@ int TWPartitionManager::Run_Backup(void) {
 					for (subpart = Partitions.begin(); subpart != Partitions.end(); subpart++) {
 						if ((*subpart)->Can_Be_Backed_Up && (*subpart)->Is_Present && (*subpart)->Is_SubPartition && (*subpart)->SubPartition_Of == backup_part->Mount_Point) {
 							partition_count++;
-							if ((*subpart)->Backup_Method == 1)
+							if ((*subpart)->Backup_Method == BM_FILES)
 								file_bytes += (*subpart)->Backup_Size;
 							else
 								img_bytes += (*subpart)->Backup_Size;
