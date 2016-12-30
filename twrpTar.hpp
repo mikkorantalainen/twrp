@@ -88,6 +88,7 @@ private:
 	TAR *t;
 	tartype_t tar_type; // Only used in createTar() but variable must persist while the tar is open
 	int fd;
+	int input_fd;                                                                   // this stores the fd for libtar to write to
 	pid_t pigz_pid;
 	pid_t oaes_pid;
 	unsigned long long file_count;
@@ -96,9 +97,9 @@ private:
 	string tarfn;
 	string basefn;
 	string password;
-	int input_fd;
-	int output_fd;
+
 	std::vector<TarListStruct> *ItemList;
+	int output_fd;                                                                  // this stores the output fd that gzip will read from
 	unsigned thread_id;
 };
 

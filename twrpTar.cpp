@@ -867,7 +867,7 @@ int twrpTar::createTar() {
 			gui_err("backup_error=Error creating backup.");
 			return -1;
 		}
-		int output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+		output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 		if (output_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			for (i = 0; i < 4; i++)
@@ -952,7 +952,7 @@ int twrpTar::createTar() {
 		Archive_Current_Type = 1;
 		LOGINFO("Using compression...\n");
 		int pigzfd[2];
-		int output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+		output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 		if (output_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			close(pigzfd[0]);
@@ -1004,7 +1004,7 @@ int twrpTar::createTar() {
 		Archive_Current_Type = 2;
 		LOGINFO("Using encryption...\n");
 		int oaesfd[2];
-		int output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+		output_fd = open(tarfn.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 		if (output_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			return -1;
@@ -1071,7 +1071,7 @@ int twrpTar::openTar() {
 	if (Archive_Current_Type == 3) {
 		LOGINFO("Opening encrypted and compressed backup...\n");
 		int i, pipes[4];
-		int input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
+		input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
 		if (input_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			return -1;
@@ -1164,7 +1164,7 @@ int twrpTar::openTar() {
 	} else if (Archive_Current_Type == 2) {
 		LOGINFO("Opening encrypted backup...\n");
 		int oaesfd[2];
-		int input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
+		input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
 		if (input_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			return -1;
@@ -1213,7 +1213,7 @@ int twrpTar::openTar() {
 	} else if (Archive_Current_Type == 1) {
 		LOGINFO("Opening as a gzip...\n");
 		int pigzfd[2];
-		int input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
+		input_fd = open(tarfn.c_str(), O_RDONLY | O_LARGEFILE);
 		if (input_fd < 0) {
 			gui_msg(Msg(msg::kError, "error_opening_strerr=Error opening: '{1}' ({2})")(tarfn)(strerror(errno)));
 			return -1;
@@ -1236,8 +1236,8 @@ int twrpTar::openTar() {
 		} else if (pigz_pid == 0) {
 			// Child
 			close(pigzfd[0]);
-			dup2(input_fd, fileno(stdin)); // remap input fd to stdin
 			dup2(pigzfd[1], fileno(stdout)); // remap stdout
+			dup2(input_fd, fileno(stdin)); // remap input fd to stdin
 			if (execlp("pigz", "pigz", "-d", "-c", NULL) < 0) {
 				close(pigzfd[1]);
 				close(input_fd);
