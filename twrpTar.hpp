@@ -50,6 +50,7 @@ public:
 	void setsize(unsigned long long backup_size);
 	void setpassword(string pass);
 	unsigned long long get_size();
+	void Set_Archive_Type(Archive_Type archive_type);
 
 public:
 	int use_encryption;
@@ -78,10 +79,10 @@ private:
 	static void* createList(void *cookie);
 	static void* extractMulti(void *cookie);
 	int tarList(std::vector<TarListStruct> *TarList, unsigned thread_id);
-	unsigned long long uncompressedSize(string filename, int *archive_type);
+	unsigned long long uncompressedSize(string filename);
 	static void Signal_Kill(int signum);
 
-	int Archive_Current_Type;
+	enum Archive_Type current_archive_type;
 	unsigned long long Archive_Current_Size;
 	unsigned long long Total_Backup_Size;
 	bool include_root_dir;
