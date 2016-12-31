@@ -2,7 +2,9 @@
 
 This fork differs from the original in the following ways:
 
-*   Designed to be built with CyanogenMod 13.0 only
+*   Designed to be built with LineageOS 14.1 only
+*   Default to toybox instead of busybox (can disable with `TW_USE_TOYBOX := false`)
+*   Customize the mksh prompt and environment by editing `mksh/mkshrc`
 *   Require fstab v2 syntax (see examples and supported flags below)
 *   Use external repositories for pigz, exfat, fuse
 *   Power key toggles screen on/off
