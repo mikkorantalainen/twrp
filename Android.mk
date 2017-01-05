@@ -198,6 +198,12 @@ ifeq ($(TW_INCLUDE_CRYPTO), true)
     LOCAL_SHARED_LIBRARIES += libcryptfslollipop libgpt_twrp libe4crypt
     LOCAL_C_INCLUDES += external/boringssl/src/include
     TW_INCLUDE_CRYPTO_FBE := true
+    ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),)
+    ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),false)
+        LOCAL_CFLAGS += -DTW_CRYPTO_USE_SYSTEM_VOLD
+        LOCAL_STATIC_LIBRARIES += libvolddecrypt
+    endif
+    endif
 endif
 ifeq ($(TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID), true)
     LOCAL_CFLAGS += -DTW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID
@@ -303,6 +309,11 @@ ifeq ($(TW_INCLUDE_INJECTTWRP), true)
 endif
 ifneq ($(TW_EXCLUDE_DEFAULT_USB_INIT), true)
     LOCAL_ADDITIONAL_DEPENDENCIES += init.recovery.usb.rc
+endif
+ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),)
+ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),false)
+    LOCAL_ADDITIONAL_DEPENDENCIES += init.recovery.vold_decrypt.rc
+endif
 endif
 ifneq ($(TARGET_RECOVERY_DEVICE_MODULES),)
     LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_RECOVERY_DEVICE_MODULES)
@@ -454,6 +465,11 @@ ifeq ($(TW_INCLUDE_CRYPTO), true)
     include $(commands_recovery_local_path)/crypto/scrypt/Android.mk
     ifeq ($(TW_INCLUDE_CRYPTO_FBE), true)
         include $(commands_recovery_local_path)/crypto/ext4crypt/Android.mk
+    endif
+    ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),)
+    ifneq ($(TW_CRYPTO_USE_SYSTEM_VOLD),false)
+        include $(commands_recovery_local_path)/crypto/vold_decrypt/Android.mk
+    endif
     endif
     include $(commands_recovery_local_path)/gpt/Android.mk
 endif

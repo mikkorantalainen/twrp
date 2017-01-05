@@ -59,6 +59,9 @@
 #if defined(TW_INCLUDE_CRYPTO) && defined(TW_INCLUDE_FBE)
 	#include "crypto/ext4crypt/Decrypt.h"
 #endif
+#ifdef TW_CRYPTO_USE_SYSTEM_VOLD
+	#include "crypto/vold_decrypt/vold_decrypt.h"
+#endif
 #ifdef AB_OTA_UPDATER
 #include <hardware/hardware.h>
 #include <hardware/boot_control.h>
@@ -1529,6 +1532,12 @@ int TWPartitionManager::Decrypt_Device(string Password) {
 		else
 			pwret = WEXITSTATUS(status) ? -1 : 0;
 	}
+
+#ifdef TW_CRYPTO_USE_SYSTEM_VOLD
+	if (pwret != 0) {
+		pwret = vold_decrypt(Password);
+	}
+#endif // TW_CRYPTO_USE_SYSTEM_VOLD
 
 	// Unmount any partitions that were needed for decrypt
 	for (iter = Partitions.begin(); iter != Partitions.end(); iter++) {
