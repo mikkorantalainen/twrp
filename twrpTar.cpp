@@ -112,8 +112,7 @@ void twrpTar::Set_Archive_Type(Archive_Type archive_type) {
 
 int twrpTar::createTarFork(pid_t *tar_fork_pid) {
 	int status = 0;
-	pid_t rc_pid;
-	int progress_pipe[2], ret;
+	int progress_pipe[2];
 
 	file_count = 0;
 	if (backup_exclusions == NULL) {
@@ -471,8 +470,8 @@ int twrpTar::createTarFork(pid_t *tar_fork_pid) {
 
 int twrpTar::extractTarFork() {
 	int status = 0;
-	pid_t rc_pid, tar_fork_pid;
-	int progress_pipe[2], ret;
+	pid_t tar_fork_pid;
+	int progress_pipe[2];
 
 	if (pipe(progress_pipe) < 0) {
 		LOGINFO("Error creating progress tracking pipe\n");
@@ -647,7 +646,6 @@ int twrpTar::Generate_TarList(string Path, std::vector<TarListStruct> *TarList, 
 	struct stat st;
 	string FileName;
 	struct TarListStruct TarItem;
-	string::size_type i;
 	int ret, file_count;
 	file_count = 0;
 
@@ -742,7 +740,6 @@ int twrpTar::tarList(std::vector<TarListStruct> *TarList, unsigned thread_id) {
 	int list_size = TarList->size(), i = 0, archive_count = 0;
 	string temp;
 	char actual_filename[PATH_MAX];
-	char *ptr;
 	unsigned long long fs;
 
 	if (split_archives) {

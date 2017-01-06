@@ -821,8 +821,6 @@ bool TWPartition::Make_Dir(string Path, bool Display_Error) {
 }
 
 void TWPartition::Setup_File_System(bool Display_Error) {
-	struct statfs st;
-
 	Can_Be_Mounted = true;
 	Can_Be_Wiped = true;
 
@@ -946,7 +944,6 @@ bool TWPartition::Find_MTD_Block_Device(string MTD_Name) {
 	{
 		char device[32], label[32];
 		unsigned long size = 0;
-		char* fstype = NULL;
 		int deviceId;
 
 		sscanf(line, "%s %lx %*s %*c%s", device, &size, label);
@@ -2455,7 +2452,6 @@ bool TWPartition::Update_Size(bool Display_Error) {
 
 	if (Has_Data_Media) {
 		if (Mount(Display_Error)) {
-			unsigned long long data_media_used, actual_data;
 			Used = backup_exclusions.Get_Folder_Size(Mount_Point);
 			Backup_Size = Used;
 			int bak = (int)(Used / 1048576LLU);
@@ -2556,7 +2552,6 @@ uint64_t TWPartition::Get_Max_FileSize() {
 	const uint64_t constGB = (uint64_t) 1024 * 1024 * 1024;
 	const uint64_t constTB = (uint64_t) constGB * 1024;
 	const uint64_t constPB = (uint64_t) constTB * 1024;
-	const uint64_t constEB = (uint64_t) constPB * 1024;
 	if (Current_File_System == "ext4")
 		maxFileSize = 16 * constTB; //16 TB
 	else if (Current_File_System == "vfat")
@@ -2603,7 +2598,6 @@ bool TWPartition::Flash_Image(PartitionSettings *part_settings) {
 			if (Is_Sparse_Image(full_filename)) {
 				return Flash_Sparse_Image(full_filename);
 			}
-			unsigned long long file_size = (unsigned long long)(TWFunc::Get_File_Size(full_filename));
 			return Raw_Read_Write(part_settings);
 		} else if (Backup_Method == BM_FLASH_UTILS) {
 			return Flash_Image_FI(full_filename, NULL);
