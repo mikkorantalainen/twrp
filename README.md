@@ -4,11 +4,14 @@ This fork differs from the original in the following ways:
 
 *   Designed to be built with LineageOS 14.1 only
 *   Default to toybox instead of busybox (can disable with `TW_USE_TOYBOX := false`)
+*   Encrypted backups are disabled by default due to poor implementation, see [TWRP Issue \#817](https://github.com/TeamWin/Team-Win-Recovery-Project/issues/817) (can be re-enabled with `TW_EXCLUDE_ENCRYPTED_BACKUPS := false`)
 *   Customize the mksh prompt and environment by editing `mksh/mkshrc`
 *   Require fstab v2 syntax (see examples and supported flags below)
 *   Use external repositories for pigz, exfat, fuse
 *   Power key toggles screen on/off
-*   Remove the need to specify either `DEVICE_RESOLUTION` or `TW_THEME` so long as `TARGET_SCREEN_HEIGHT` and `TARGET_SCREEN_WIDTH` are set
+*   `TW_THEME` (optionally) auto-generated from `TARGET_SCREEN_HEIGHT` and `TARGET_SCREEN_WIDTH`
+*   SuperSU and HTC Dumlock have been removed
+*   `adb backup` is not implemented due to concerns over code quality
 *   Other minor customizations (see change history)
 
 **Versioning**
