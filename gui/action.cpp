@@ -19,6 +19,7 @@
 #include <cutils/properties.h>
 #include <errno.h>
 #include <linux/input.h>
+#include <private/android_filesystem_config.h>
 #include <pthread.h>
 #include <pwd.h>
 #include <signal.h>
@@ -926,14 +927,8 @@ int GUIAction::screenshot(std::string arg __unused)
 	time_t tm;
 	char path[256];
 	int path_len;
-	uid_t uid = 1015;
-	gid_t gid = 1015;
-
-	struct passwd *pwd = getpwnam("media_rw");
-	if (pwd) {
-		uid = pwd->pw_uid;
-		gid = pwd->pw_gid;
-	}
+	uid_t uid = AID_MEDIA_RW;
+	gid_t gid = AID_MEDIA_RW;
 
 	const std::string storage = DataManager::GetCurrentStoragePath();
 	if (PartitionManager.Is_Mounted_By_Path(storage)) {
