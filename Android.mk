@@ -332,11 +332,11 @@ include $(BUILD_EXECUTABLE)
 
 # Symlinks for pigz utilities
 include $(CLEAR_VARS)
-PIGZ_UTILITIES := gzip gunzip unpigz
+PIGZ_UTILITIES := gzip gunzip unpigz zcat
 
 pigz_symlinks:
 	@mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/sbin
-	@echo -e ${CL_CYN}"Generate pigz links:"${CL_RST} $(PIGZ_UTILITIES)
+	@echo -e "Generate pigz links: " $(PIGZ_UTILITIES)
 	$(hide) $(foreach t,$(PIGZ_UTILITIES),ln -sf pigz $(TARGET_RECOVERY_ROOT_OUT)/sbin/$(t);)
 
 # recovery-persist (system partition dynamic executable run after /data mounts)
