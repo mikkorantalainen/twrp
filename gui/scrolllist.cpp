@@ -33,8 +33,8 @@
 #include "rapidxml.hpp"
 #include "resources.hpp"
 
-#define SCROLLING_SPEED_DECREMENT 0.9f // friction
-#define SCROLLING_FLOOR 2 // minimum pixels for scrolling to stop
+const float SCROLLING_SPEED_DECREMENT = 0.9; // friction
+const int SCROLLING_FLOOR = 2; // minimum pixels for scrolling to stop
 
 GUIScrollList::GUIScrollList(xml_node<>* node) : GUIObject(node)
 {
