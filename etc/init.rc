@@ -59,11 +59,12 @@ on boot
 on load_system_props_action
     load_system_props
 
+# Load properties, vendor init lives here
 on load_persist_props_action
     load_persist_props
 
 on firmware_mounts_complete
-   rm /dev/.booting
+    rm /dev/.booting
 
 # Mount filesystems and start core system services.
 on late-init
@@ -77,7 +78,7 @@ on late-init
     # issued fs triggers have completed.
     trigger load_system_props_action
 
-    # Vendor init lives here
+    # Load properties, vendor init lives here
     trigger load_persist_props_action
 
     # Remove a file to wake up anything waiting for firmware

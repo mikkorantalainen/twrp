@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ifneq ($(TW_EXCLUDE_DEFAULT_USB_INIT), true)
-
 LOCAL_PATH := $(call my-dir)
+
+ifneq ($(TW_EXCLUDE_DEFAULT_USB_INIT), true)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := init.recovery.usb.rc
