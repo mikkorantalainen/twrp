@@ -21,7 +21,6 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libtar_twrp
 LOCAL_MODULE_TAGS := optional
-LOCAL_CFLAGS += -DHAVE_SELINUX
 LOCAL_SRC_FILES := $(common_src_files)
 LOCAL_C_INCLUDES += $(LOCAL_PATH) \
                     external/libselinux/include \

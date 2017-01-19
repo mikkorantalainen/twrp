@@ -33,10 +33,8 @@
 #ifdef TW_INCLUDE_CRYPTO
 	#include <cutils/properties.h>
 #endif
-#ifdef HAVE_SELINUX
-	#include <selinux/label.h>
-	#include <selinux/selinux.h>
-#endif
+#include <selinux/label.h>
+#include <selinux/selinux.h>
 #ifdef HAVE_CAPABILITIES
 	#include <linux/xattr.h>
 	#include <sys/capability.h>
@@ -1867,7 +1865,7 @@ bool TWPartition::Wipe_EXT4() {
 	if (!UnMount(true))
 		return false;
 
-#if defined(HAVE_SELINUX) && defined(USE_EXT4)
+#if defined(USE_EXT4)
 	int ret;
 	char *secontext = NULL;
 
@@ -2519,14 +2517,12 @@ void TWPartition::Recreate_Media_Folder(void) {
 #ifdef TW_INTERNAL_STORAGE_PATH
 		mkdir(EXPAND(TW_INTERNAL_STORAGE_PATH), 0770);
 #endif
-#ifdef HAVE_SELINUX
 		// Afterwards, we will try to set the
 		// default metadata that we were hopefully able to get during
 		// early boot.
 		tw_set_default_metadata(Media_Path.c_str());
 		if (!Internal_path.empty())
 			tw_set_default_metadata(Internal_path.c_str());
-#endif
 		// Toggle mount to ensure that "internal sdcard" gets mounted
 		PartitionManager.UnMount_By_Path(Symlink_Mount_Point, true);
 		PartitionManager.Mount_By_Path(Symlink_Mount_Point, true);

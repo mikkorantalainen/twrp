@@ -12,7 +12,7 @@ LOCAL_SRC_FILES:= \
     ../twrpDU.cpp \
     ../twrpTar.cpp
 
-LOCAL_CFLAGS:= -g -c -W -DBUILD_TWRPTAR_MAIN -DHAVE_SELINUX
+LOCAL_CFLAGS:= -g -c -W -DBUILD_TWRPTAR_MAIN
 
 LOCAL_C_INCLUDES := \
     external/libselinux/include

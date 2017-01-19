@@ -98,7 +98,6 @@ ifeq ($(TW_OEM_BUILD),true)
 endif
 
 LOCAL_CFLAGS += \
-    -DHAVE_SELINUX \
     -g \
     -DUSE_EXT4 \
     -DHAVE_CAPABILITIES

@@ -25,9 +25,7 @@
 #else
 #include <sys/reboot.h>
 #endif
-#ifdef HAVE_SELINUX
 #include <selinux/label.h>
-#endif
 
 #include <string>
 
@@ -46,9 +44,7 @@
 #include "twrp-functions.hpp"
 #include "variables.h"
 
-#ifdef HAVE_SELINUX
 struct selabel_handle *selinux_handle;
-#endif
 
 TWPartitionManager PartitionManager;
 int Log_Offset;
@@ -121,7 +117,6 @@ int main(int argc, char **argv) {
 	// Load up all the resources
 	gui_loadResources();
 
-#ifdef HAVE_SELINUX
 	if (TWFunc::Path_Exists("/prebuilt_file_contexts")) {
 		if (TWFunc::Path_Exists("/file_contexts")) {
 			LOGINFO("Renaming regular /file_contexts -> /file_contexts.bak\n");
@@ -158,9 +153,6 @@ int main(int argc, char **argv) {
 			gui_msg("full_selinux=Full SELinux support is present.");
 		}
 	}
-#else
-	gui_warn("no_selinux=No SELinux support (no libselinux).");
-#endif
 
 	PartitionManager.Mount_By_Path("/cache", false);
 
