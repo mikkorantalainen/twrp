@@ -97,49 +97,88 @@ LOCAL_MODULE_TAGS := eng
 LOCAL_MODULE_CLASS := RECOVERY_EXECUTABLES
 LOCAL_MODULE_PATH := $(TARGET_RECOVERY_ROOT_OUT)$(TWRES_PATH)
 
+# The extra blank line before *** is intentional to ensure it ends up on its own line
+define TW_THEME_WARNING_MSG
+
+****************************************************************************
+  Could not find ui.xml for TW_THEME: $(TW_THEME)
+  Set TARGET_SCREEN_WIDTH and TARGET_SCREEN_HEIGHT to automatically select
+  an appropriate theme, or set TW_THEME to one of the following:
+    $(notdir $(wildcard $(commands_recovery_local_path)/gui/theme/*_*))
+****************************************************************************
+endef
+define TW_CUSTOM_THEME_WARNING_MSG
+
+****************************************************************************
+  Could not find ui.xml for TW_CUSTOM_THEME: $(TW_CUSTOM_THEME)
+  Expected to find cutom theme's ui.xml at:
+    $(TWRP_THEME_LOC)/ui.xml
+  Please fix this or set TW_THEME to one of the following:
+    $(notdir $(wildcard $(commands_recovery_local_path)/gui/theme/*_*))
+****************************************************************************
+endef
+
+TWRP_RES := $(commands_recovery_local_path)/gui/theme/common/fonts
+TWRP_RES += $(commands_recovery_local_path)/gui/theme/common/languages
+ifeq ($(TW_EXTRA_LANGUAGES),true)
+    TWRP_RES += $(commands_recovery_local_path)/gui/theme/extra-languages/fonts
+    TWRP_RES += $(commands_recovery_local_path)/gui/theme/extra-languages/languages
+endif
+
 ifeq ($(TW_CUSTOM_THEME),)
     ifeq ($(TW_THEME),)
-        ifeq ($(TARGET_SCREEN_WIDTH),)
-            $(error ERROR: TARGET_SCREEN_WIDTH must be defined in your device board files)
-        else ifeq ($(TARGET_SCREEN_HEIGHT),)
-            $(error ERROR: TARGET_SCREEN_HEIGHT must be defined in your device board files)
+        ifeq ($(DEVICE_RESOLUTION),)
+            GUI_WIDTH := $(TARGET_SCREEN_WIDTH)
+            GUI_HEIGHT := $(TARGET_SCREEN_HEIGHT)
+        else
+            SPLIT_DEVICE_RESOLUTION := $(subst x, ,$(DEVICE_RESOLUTION))
+            GUI_WIDTH := $(word 1, $(SPLIT_DEVICE_RESOLUTION))
+            GUI_HEIGHT := $(word 2, $(SPLIT_DEVICE_RESOLUTION))
         endif
-        ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -gt $(TARGET_SCREEN_HEIGHT); echo $$?),0)
-            ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -ge 1280; echo $$?),0)
-                TW_THEME := landscape_hdpi
-            else
-                TW_THEME := landscape_mdpi
+
+        # Minimum resolution of 100x100
+        # This also ensures GUI_WIDTH and GUI_HEIGHT are numbers
+        ifeq ($(shell test $(GUI_WIDTH) -ge 100; echo $$?),0)
+        ifeq ($(shell test $(GUI_HEIGHT) -ge 100; echo $$?),0)
+            ifeq ($(shell test $(GUI_WIDTH) -gt $(GUI_HEIGHT); echo $$?),0)
+                ifeq ($(shell test $(GUI_WIDTH) -ge 1280; echo $$?),0)
+                    TW_THEME := landscape_hdpi
+                else
+                    TW_THEME := landscape_mdpi
+                endif
+            else ifeq ($(shell test $(GUI_WIDTH) -lt $(GUI_HEIGHT); echo $$?),0)
+                ifeq ($(shell test $(GUI_WIDTH) -ge 720; echo $$?),0)
+                    TW_THEME := portrait_hdpi
+                else
+                    TW_THEME := portrait_mdpi
+                endif
+            else ifeq ($(shell test $(GUI_WIDTH) -eq $(GUI_HEIGHT); echo $$?),0)
+                # watch_hdpi does not yet exist
+                TW_THEME := watch_mdpi
             endif
-        else ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -lt $(TARGET_SCREEN_HEIGHT); echo $$?),0)
-            ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -ge 720; echo $$?),0)
-                TW_THEME := portrait_hdpi
-            else
-                TW_THEME := portrait_mdpi
-            endif
-        else ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -eq $(TARGET_SCREEN_HEIGHT); echo $$?),0)
-            # watch_hdpi does not yet exist
-            TW_THEME := watch_mdpi
+        endif
         endif
     endif
 
     TWRP_THEME_LOC := $(commands_recovery_local_path)/gui/theme/$(TW_THEME)
-    TWRP_RES := $(commands_recovery_local_path)/gui/theme/common/fonts
-    TWRP_RES += $(commands_recovery_local_path)/gui/theme/common/languages
-    TWRP_RES += $(commands_recovery_local_path)/gui/theme/common/$(word 1,$(subst _, ,$(TW_THEME))).xml
-    ifeq ($(TW_EXTRA_LANGUAGES),true)
-        TWRP_RES += $(commands_recovery_local_path)/gui/theme/extra-languages/fonts
-        TWRP_RES += $(commands_recovery_local_path)/gui/theme/extra-languages/languages
+    ifeq ($(wildcard $(TWRP_THEME_LOC)/ui.xml),)
+        $(warning $(TW_THEME_WARNING_MSG))
+        $(error Theme selection failed; exiting)
     endif
+
+    TWRP_RES += $(commands_recovery_local_path)/gui/theme/common/$(word 1,$(subst _, ,$(TW_THEME))).xml
     # for future copying of used include xmls and fonts:
     # UI_XML := $(TWRP_THEME_LOC)/ui.xml
     # TWRP_INCLUDE_XMLS := $(shell xmllint --xpath '/recovery/include/xmlfile/@name' $(UI_XML)|sed -n 's/[^\"]*\"\([^\"]*\)\"[^\"]*/\1\n/gp'|sort|uniq)
     # TWRP_FONTS_TTF := $(shell xmllint --xpath '/recovery/resources/font/@filename' $(UI_XML)|sed -n 's/[^\"]*\"\([^\"]*\)\"[^\"]*/\1\n/gp'|sort|uniq)niq)
-    ifeq ($(wildcard $(TWRP_THEME_LOC)/ui.xml),)
-        $(error ERROR: TW_THEME '$(TW_THEME)' is not one of $(sort $(notdir $(wildcard $(commands_recovery_local_path)/gui/theme/*_*))))
-    endif
 else
     TWRP_THEME_LOC := $(TW_CUSTOM_THEME)
+    ifeq ($(wildcard $(TWRP_THEME_LOC)/ui.xml),)
+        $(warning $(TW_CUSTOM_THEME_WARNING_MSG))
+        $(error Theme selection failed; exiting)
+    endif
 endif
+
 TWRP_RES += $(TW_ADDITIONAL_RES)
 
 TWRP_RES_GEN := $(intermediates)/twrp
