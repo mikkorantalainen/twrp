@@ -197,7 +197,7 @@ GUIAction::GUIAction(xml_node<>* node)
 		ADD_ACTION(checkpartitionlifetimewrites);
 		ADD_ACTION(mountsystemtoggle);
 		ADD_ACTION(setlanguage);
-		ADD_ACTION(setbacklight);
+		ADD_ACTION(togglebacklight);
 
 		// remember actions that run in the caller thread
 		for (mapFunc::const_iterator it = mf.begin(); it != mf.end(); ++it)
@@ -1786,7 +1786,7 @@ int GUIAction::setlanguage(std::string arg __unused)
 	return 0;
 }
 
-int GUIAction::setbacklight(std::string arg __unused)
+int GUIAction::togglebacklight(std::string arg __unused)
 {
 	blankTimer.toggleBlank();
 	return 0;

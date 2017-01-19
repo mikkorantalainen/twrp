@@ -4330,7 +4330,7 @@
 
 			<action>
 				<touch key="power"/>
-				<action function="setbacklight"/>
+				<action function="togglebacklight"/>
 			</action>
 		</page>
 
@@ -5267,7 +5267,7 @@
 
 			<action>
 				<touch key="power"/>
-				<action function="setbacklight"/>
+				<action function="togglebacklight"/>
 			</action>
 
 			<action>
