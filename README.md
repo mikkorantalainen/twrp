@@ -3,7 +3,6 @@
 This fork differs from the original in the following ways:
 
 *   Designed to be built with LineageOS 14.1 only
-*   Default to toybox instead of busybox (can disable with `TW_USE_TOYBOX := false`)
 *   Encrypted backups are disabled by default due to poor implementation, see [TWRP Issue \#817](https://github.com/TeamWin/Team-Win-Recovery-Project/issues/817) (can be re-enabled with `TW_EXCLUDE_ENCRYPTED_BACKUPS := false`)
 *   Customize the mksh prompt and environment by editing `mksh/mkshrc`
 *   Require fstab v2 syntax (see examples and supported flags below)
@@ -13,6 +12,14 @@ This fork differs from the original in the following ways:
 *   SuperSU and HTC Dumlock have been removed
 *   `adb backup` is not implemented due to concerns over code quality
 *   Other minor customizations (see change history)
+
+**BusyBox vs. Toybox**
+
+This fork is ready to rock with toybox... if only toybox were a truly suitable replacement for busybox. Specify `TW_USE_TOYBOX := true` to replace busybox with toybox, but be aware that many recovery installable packages depend on tools in busybox like `awk` that are not present in toybox, as well as arguments to available tools like `--ignore-fail-on-non-empty` for `rmdir` and `-empty` for `find` that are also missing. So, venture at your own risk.
+
+The BusyBox repository at LineageOS can be synced by adding the following to your local manifest:
+
+    <project name="LineageOS/android_external_busybox" path="external/busybox" remote="github" />
 
 **Versioning**
 

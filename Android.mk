@@ -82,10 +82,6 @@ LOCAL_SHARED_LIBRARIES := \
     libtar_twrp \
     libz
 
-ifeq ($(TW_USE_TOYBOX),)
-    TW_USE_TOYBOX := true
-endif
-
 ifeq ($(TW_EXCLUDE_ENCRYPTED_BACKUPS),)
     TW_EXCLUDE_ENCRYPTED_BACKUPS := true
 endif
