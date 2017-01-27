@@ -1093,7 +1093,6 @@ bool TWPartition::Find_Partition_Size(void) {
 	{
 		unsigned long major, minor, blocks;
 		char device[512];
-		char tmpString[64];
 
 		if (strlen(line) < 7 || line[0] == 'm')	 continue;
 		sscanf(line + 1, "%lu %lu %lu %s", &major, &minor, &blocks, device);
@@ -2517,12 +2516,14 @@ void TWPartition::Recreate_Media_Folder(void) {
 #ifdef TW_INTERNAL_STORAGE_PATH
 		mkdir(EXPAND(TW_INTERNAL_STORAGE_PATH), 0770);
 #endif
+
 		// Afterwards, we will try to set the
 		// default metadata that we were hopefully able to get during
 		// early boot.
 		tw_set_default_metadata(Media_Path.c_str());
 		if (!Internal_path.empty())
 			tw_set_default_metadata(Internal_path.c_str());
+
 		// Toggle mount to ensure that "internal sdcard" gets mounted
 		PartitionManager.UnMount_By_Path(Symlink_Mount_Point, true);
 		PartitionManager.Mount_By_Path(Symlink_Mount_Point, true);

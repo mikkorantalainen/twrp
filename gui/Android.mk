@@ -28,9 +28,9 @@ LOCAL_SRC_FILES := \
     scrolllist.cpp \
     slider.cpp \
     slidervalue.cpp \
+    terminal.cpp \
     text.cpp \
     textbox.cpp \
-    terminal.cpp \
     twmsg.cpp
 
 ifneq ($(TWRP_CUSTOM_KEYBOARD),)

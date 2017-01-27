@@ -285,7 +285,7 @@ th_read(TAR *t)
 				printf("    th_read(): Posix capabilities detected\n");
 #endif
 			} // end posix capabilities
-
+			// selinux contexts
 			start = strstr(buf, SELINUX_TAG);
 			if(start && start+SELINUX_TAG_LEN < buf+len)
 			{
@@ -298,7 +298,7 @@ th_read(TAR *t)
 					printf("    th_read(): SELinux context xattr detected: %s\n", t->th_buf.selinux_context);
 #endif
 				}
-			}
+			} // end selinux contexts
 #ifdef HAVE_EXT4_CRYPT
 			start = strstr(buf, E4CRYPT_TAG);
 			if(start && start+E4CRYPT_TAG_LEN < buf+len)
