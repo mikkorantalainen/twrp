@@ -1,6 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 common_src_files := \
+    android_utils.c \
     append.c \
     basename.c \
     block.c \
