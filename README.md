@@ -7,10 +7,8 @@ This fork differs from the original in the following ways:
 *   Customize the mksh prompt and environment by editing `mksh/mkshrc`
 *   Require fstab v2 syntax (see examples and supported flags below)
 *   Use external repositories for pigz, exfat, fuse
-*   Power key toggles screen on/off
-*   `TW_THEME` (optionally) auto-generated from `TARGET_SCREEN_HEIGHT` and `TARGET_SCREEN_WIDTH`
 *   SuperSU and HTC Dumlock have been removed
-*   `adb backup` is not implemented due to concerns over code quality
+*   `adb backup` is not implemented due to concerns about code quality
 *   Other minor customizations (see change history)
 
 **BusyBox vs. Toybox**
