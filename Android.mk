@@ -319,11 +319,24 @@ ifeq ($(TARGET_USERIMAGES_USE_F2FS), true)
         mkfs.f2fs
 endif
 
+LOCAL_ADDITIONAL_DEPENDENCIES += file_contexts_symlink
+
 ifeq ($(BOARD_CACHEIMAGE_PARTITION_SIZE),)
 LOCAL_REQUIRED_MODULES := recovery-persist recovery-refresh
 endif
 
 include $(BUILD_EXECUTABLE)
+
+# Symlink for file_contexts
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := file_contexts_symlink
+LOCAL_MODULE_TAGS := optional
+LOCAL_POST_INSTALL_CMD := \
+    $(hide) mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/sbin && \
+    ln -sf /file_contexts.bin $(TARGET_RECOVERY_ROOT_OUT)/file_contexts
+
+include $(BUILD_PHONY_PACKAGE)
 
 # Symlinks for pigz utilities
 include $(CLEAR_VARS)
