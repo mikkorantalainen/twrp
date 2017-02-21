@@ -48,8 +48,11 @@
 #include "rapidxml.hpp"
 #include "resources.hpp"
 
-// version 2 requires theme to handle power button as action togglebacklight
-#define TW_THEME_VERSION 2
+/* Version History:
+ * 2 - Theme handles power button as action togglebacklight
+ * 3 - Create generalized sleep_and_reboot page
+ */
+#define TW_THEME_VERSION 3
 
 #define TW_THEME_VER_ERR -2
 
