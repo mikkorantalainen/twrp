@@ -1997,7 +1997,7 @@
 
 			<button>
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="0"/>
 				</conditions>
 				<placement x="%btn4_col2_x%" y="%row11_y%"/>
@@ -2012,7 +2012,7 @@
 
 			<button>
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="1"/>
 				</conditions>
 				<placement x="%btn4_col2_x%" y="%row11_y%"/>
@@ -2135,7 +2135,7 @@
 
 			<text style="text_m">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="0"/>
 				</conditions>
 				<placement x="%col1_x_right%" y="%row4a_y%"/>
@@ -2144,7 +2144,7 @@
 
 			<text style="text_m">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="1"/>
 				</conditions>
 				<placement x="%col1_x_right%" y="%row4a_y%"/>

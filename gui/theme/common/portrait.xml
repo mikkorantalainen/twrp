@@ -1538,7 +1538,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="0"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
@@ -1552,7 +1552,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="1"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
@@ -1649,7 +1649,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="0"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
@@ -1663,7 +1663,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="1"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
@@ -1774,7 +1774,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="0"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
@@ -1788,7 +1788,7 @@
 
 			<button style="tab">
 				<conditions>
-					<condition var1="tw_include_encrypted_backup" var2="1"/>
+					<condition var1="tw_include_encrypted_backup" var2="999"/>
 					<condition var1="tw_encrypt_backup" var2="1"/>
 				</conditions>
 				<placement x="%tab3_col3_x%" y="%row1_y%" w="%tab3_width%" h="%tab_height%"/>
