@@ -82,10 +82,6 @@ LOCAL_SHARED_LIBRARIES := \
     libtar_twrp \
     libz
 
-ifeq ($(TW_EXCLUDE_ENCRYPTED_BACKUPS),)
-    TW_EXCLUDE_ENCRYPTED_BACKUPS := true
-endif
-
 ifeq ($(TW_OEM_BUILD),true)
     LOCAL_CFLAGS += -DTW_OEM_BUILD
     BOARD_HAS_NO_REAL_SDCARD := true
