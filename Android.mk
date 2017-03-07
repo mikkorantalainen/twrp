@@ -319,7 +319,7 @@ ifeq ($(TARGET_USERIMAGES_USE_F2FS), true)
         mkfs.f2fs
 endif
 
-LOCAL_ADDITIONAL_DEPENDENCIES += file_contexts_symlink
+LOCAL_ADDITIONAL_DEPENDENCIES += file_contexts_text
 
 ifeq ($(BOARD_CACHEIMAGE_PARTITION_SIZE),)
 LOCAL_REQUIRED_MODULES := recovery-persist recovery-refresh
@@ -327,14 +327,14 @@ endif
 
 include $(BUILD_EXECUTABLE)
 
-# Symlink for file_contexts
+# file_contexts
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := file_contexts_symlink
+LOCAL_MODULE := file_contexts_text
 LOCAL_MODULE_TAGS := optional
+LOCAL_REQUIRED_MODULES := file_contexts.bin
 LOCAL_POST_INSTALL_CMD := \
-    $(hide) mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/sbin && \
-    ln -sf /file_contexts.bin $(TARGET_RECOVERY_ROOT_OUT)/file_contexts
+    $(hide) cp -f $(OUT)/obj/ETC/file_contexts.bin_intermediates/file_contexts.concat.tmp $(TARGET_RECOVERY_ROOT_OUT)/file_contexts
 
 include $(BUILD_PHONY_PACKAGE)
 
