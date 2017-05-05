@@ -3,7 +3,7 @@
 This fork differs from the original in the following ways:
 
 *   Designed to be built with LineageOS 14.1 only
-*   Encrypted backups are disabled by default due to poor implementation, see [TWRP Issue \#817](https://github.com/TeamWin/Team-Win-Recovery-Project/issues/817) (can be re-enabled with `TW_EXCLUDE_ENCRYPTED_BACKUPS := false`)
+*   Encrypted backups are disabled by default due to poor implementation, see [TWRP Issue \#817](https://github.com/TeamWin/Team-Win-Recovery-Project/issues/817)
 *   Customize the mksh prompt and environment by editing `mksh/mkshrc`
 *   Require fstab v2 syntax (see examples and supported flags below)
 *   Use external repositories for pigz, exfat, fuse
@@ -18,6 +18,13 @@ This fork is ready to rock with toybox... if only toybox were a truly suitable r
 The BusyBox repository at LineageOS can be synced by adding the following to your local manifest:
 
     <project name="LineageOS/android_external_busybox" path="external/busybox" remote="github" />
+
+At last check (May 4, 2017), LineageOS' busybox repository still needs [this patch](https://github.com/mdmower/android_external_busybox/commit/133e2524ba1db1231c4a3dfcf8c13427c778d7ab).
+
+**To Do**
+
+*   Fix hard-coding of alternate block device search ([code link](https://github.com/mdmower/twrp/blob/f37aff92a89e06c6a7a7e63056aec1e9ba7fdcf1/partition.cpp#L2707-L2715))
+*   Support vold-formatted entries in fstab (e.g. `/devices/platform/msm_hsusb_host/usb*` instead of `/dev/block/sda1`)
 
 **Versioning**
 
