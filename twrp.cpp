@@ -43,6 +43,7 @@
 #include "twcommon.h"
 #include "twrp-functions.hpp"
 #include "variables.h"
+#include "minadbd21/adb.h"
 
 struct selabel_handle *selinux_handle;
 

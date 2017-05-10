@@ -429,10 +429,17 @@ ifeq ($(wildcard system/core/uncrypt/Android.mk),)
     include $(commands_recovery_local_path)/uncrypt/Android.mk
 endif
 
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -gt 22; echo $$?),0)
+    include $(commands_recovery_local_path)/minadbd/Android.mk \
+        $(commands_recovery_local_path)/minui/Android.mk
+else
+    TARGET_GLOBAL_CFLAGS += -DTW_USE_MINUI_21
+    include $(commands_recovery_local_path)/minadbd21/Android.mk \
+        $(commands_recovery_local_path)/minui21/Android.mk
+endif
+
 #includes for TWRP
 include $(commands_recovery_local_path)/injecttwrp/Android.mk \
-    $(commands_recovery_local_path)/minadbd/Android.mk \
-    $(commands_recovery_local_path)/minui/Android.mk \
     $(commands_recovery_local_path)/gui/Android.mk \
     $(commands_recovery_local_path)/mmcutils/Android.mk \
     $(commands_recovery_local_path)/bmlutils/Android.mk \
