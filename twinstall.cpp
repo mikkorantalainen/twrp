@@ -196,11 +196,13 @@ static int Run_Update_Binary(const char *path, ZipArchive *Zip, int* wipe_cache,
 	FILE* child_data;
 
 #ifndef TW_NO_LEGACY_PROPS
-	/* Set legacy properties */
-	if (switch_to_legacy_properties() != 0) {
-		LOGERR("Legacy property environment did not initialize successfully. Properties may not be detected.\n");
-	} else {
-		LOGINFO("Legacy property environment initialized.\n");
+	if (DataManager::GetIntValue("tw_enable_legacy_props") != 0) {
+		/* Set legacy properties */
+		if (switch_to_legacy_properties() != 0) {
+			LOGERR("Legacy property environment did not initialize successfully. Properties may not be detected.\n");
+		} else {
+			LOGINFO("Legacy property environment initialized.\n");
+		}
 	}
 #endif
 
@@ -281,12 +283,14 @@ static int Run_Update_Binary(const char *path, ZipArchive *Zip, int* wipe_cache,
 	int waitrc = TWFunc::Wait_For_Child(pid, &status, "Updater");
 
 #ifndef TW_NO_LEGACY_PROPS
-	/* Unset legacy properties */
-	if (legacy_props_path_modified) {
-		if (switch_to_new_properties() != 0) {
-			LOGERR("Legacy property environment did not disable successfully. Legacy properties may still be in use.\n");
-		} else {
-			LOGINFO("Legacy property environment disabled.\n");
+	if (DataManager::GetIntValue("tw_enable_legacy_props") != 0) {
+		/* Unset legacy properties */
+		if (legacy_props_path_modified) {
+			if (switch_to_new_properties() != 0) {
+				LOGERR("Legacy property environment did not disable successfully. Legacy properties may still be in use.\n");
+			} else {
+				LOGINFO("Legacy property environment disabled.\n");
+			}
 		}
 	}
 #endif
